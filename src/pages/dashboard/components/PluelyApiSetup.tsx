@@ -54,7 +54,6 @@ export const PluelyApiSetup = () => {
   const {
     pluelyApiEnabled,
     setPluelyApiEnabled,
-    hasActiveLicense,
     setHasActiveLicense,
     getActiveLicenseStatus,
     setSupportsImages,

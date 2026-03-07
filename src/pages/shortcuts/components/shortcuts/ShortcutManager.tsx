@@ -12,11 +12,9 @@ import {
 } from "@/lib";
 import { ShortcutAction, ShortcutBinding } from "@/types";
 import { invoke } from "@tauri-apps/api/core";
-import { useApp } from "@/contexts";
 import { ShortcutRecorder } from "./ShortcutRecorder";
 
 export const ShortcutManager = () => {
-  const { hasActiveLicense } = useApp();
   const [actions, setActions] = useState<ShortcutAction[]>([]);
   const [bindings, setBindings] = useState<Record<string, ShortcutBinding>>({});
   const [editingAction, setEditingAction] = useState<string | null>(null);
