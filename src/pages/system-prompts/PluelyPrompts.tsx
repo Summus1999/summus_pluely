@@ -204,14 +204,14 @@ export const PluelyPrompts = () => {
     return (
       <div className="space-y-4 mt-6">
         <Header
-          title="Pluely Default Prompts"
-          description="Pre-configured prompts with optimal model selection"
+          title="Pluely 默认提示词"
+          description="预配置提示词，搭配推荐模型"
         />
         <Empty
           isLoading={true}
           icon={Sparkles}
-          title="Loading prompts..."
-          description="Fetching Pluely default prompts"
+          title="加载提示词中..."
+          description="正在获取 Pluely 默认提示词"
         />
       </div>
     );
@@ -221,8 +221,8 @@ export const PluelyPrompts = () => {
     return (
       <div className="space-y-4 mt-6">
         <Header
-          title="Pluely Default Prompts"
-          description="Pre-configured prompts with optimal model selection"
+          title="Pluely 默认提示词"
+          description="预配置提示词，搭配推荐模型"
         />
         <div className="rounded-lg border border-destructive/20 bg-destructive/10 p-3">
           <p className="text-sm text-destructive">{error}</p>
@@ -242,18 +242,18 @@ export const PluelyPrompts = () => {
           <div className="flex flex-col gap-1 w-full">
             <Header
               title="Pluely Default Prompts"
-              description="Pre-configured prompts with optimal model pairings. Selecting a prompt will automatically set the recommended AI model for best results."
+              description="预配置提示词与推荐模型搭配。选择提示词将自动设置推荐的 AI 模型以获得最佳效果。"
             />
             {lastUpdated && (
               <div className="flex justify-end items-center gap-1 text-[10px] text-muted-foreground">
                 <ClockIcon className="size-2" />
-                <span>Last updated: {moment(lastUpdated).fromNow()}</span>
+                <span>上次更新：{moment(lastUpdated).fromNow()}</span>
               </div>
             )}
           </div>
         </div>
         {!hasActiveLicense && (
-          <GetLicense buttonText="Unlock" buttonClassName="shrink-0" />
+          <GetLicense buttonText="解锁" buttonClassName="shrink-0" />
         )}
       </div>
 

@@ -4,8 +4,8 @@ import { PageLayout } from "@/layouts";
 const Shortcuts = () => {
   return (
     <PageLayout
-      title="Cursor & Keyboard Shortcuts"
-      description="Manage your cursor and keyboard shortcuts"
+      title="光标与键盘快捷键"
+      description="管理光标和键盘快捷键"
     >
       <div className="flex flex-col gap-6 pb-8">
         {/* Cursor Selection */}

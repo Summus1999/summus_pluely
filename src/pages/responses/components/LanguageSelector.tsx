@@ -32,8 +32,8 @@ export const LanguageSelector = () => {
   return (
     <div className="space-y-4">
       <Header
-        title="Response Language"
-        description="Select the language for AI responses. Setting applies globally to all providers and conversations. Language support may vary depending on your selected LLM provider"
+        title="响应语言"
+        description="选择 AI 响应的语言。此设置全局应用于所有提供商和对话。语言支持可能因所选 LLM 提供商而异"
         isMainTitle
       />
 
@@ -42,7 +42,7 @@ export const LanguageSelector = () => {
           selected={selectedLanguage}
           onChange={handleLanguageChange}
           options={languageOptions}
-          placeholder="Select a language"
+          placeholder="选择语言"
           disabled={!hasActiveLicense}
         />
       </div>

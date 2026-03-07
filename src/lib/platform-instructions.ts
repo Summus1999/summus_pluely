@@ -7,7 +7,7 @@ export interface PromptTemplate {
 export const PROMPT_TEMPLATES: PromptTemplate[] = [
   {
     id: "real_time_translator",
-    name: "Real-time Translator",
+    name: "实时翻译",
     prompt: `You are a real-time translation assistant. Listen to system audio and provide instant, accurate translations. Be concise and quick.
 
 [ADD YOUR TRANSLATION SETTINGS HERE]
@@ -19,7 +19,7 @@ Provide immediate translations of what you hear. Keep responses short and clear 
   },
   {
     id: "meeting_assistant",
-    name: "Meeting Assistant",
+    name: "会议助手",
     prompt: `You are a transparent meeting assistant. Listen to conversations and provide real-time insights, summaries, and action items.
 
 [ADD YOUR MEETING CONTEXT HERE]
@@ -32,7 +32,7 @@ Provide quick insights, key points, and actionable information as the meeting pr
   },
   {
     id: "interview_assistant",
-    name: "Interview Assistant",
+    name: "面试助手",
     prompt: `You are a real-time interview assistant. Help answer questions by providing quick, relevant talking points based on the candidate's background.
 
 [ADD YOUR RESUME HERE]
@@ -52,7 +52,7 @@ Listen to interview questions and provide concise, relevant talking points to he
   },
   {
     id: "technical_interview",
-    name: "Technical Interview Helper",
+    name: "技术面试助手",
     prompt: `You are a technical interview assistant. Provide quick hints, approaches, and explanations for technical questions.
 
 [ADD YOUR TECHNICAL BACKGROUND HERE]
@@ -70,7 +70,7 @@ Listen to technical questions and provide brief, helpful guidance and approaches
   },
   {
     id: "presentation_coach",
-    name: "Presentation Coach",
+    name: "演讲教练",
     prompt: `You are a real-time presentation assistant. Help improve delivery, suggest talking points, and provide confidence boosters.
 
 [ADD YOUR PRESENTATION CONTEXT HERE]
@@ -84,7 +84,7 @@ Provide quick tips, talking points, and encouragement as you present.`,
   },
   {
     id: "learning_assistant",
-    name: "Learning Assistant",
+    name: "学习助手",
     prompt: `You are a real-time learning companion. Help understand concepts, provide explanations, and suggest questions during lectures or tutorials.
 
 [ADD YOUR LEARNING CONTEXT HERE]
@@ -98,7 +98,7 @@ Provide quick explanations, clarifications, and helpful insights as you learn.`,
   },
   {
     id: "customer_call_helper",
-    name: "Customer Call Helper",
+    name: "客服电话助手",
     prompt: `You are a customer service assistant. Help handle customer calls by providing quick responses, solutions, and talking points.
 
 [ADD YOUR PRODUCT/SERVICE INFO HERE]
@@ -112,7 +112,7 @@ Listen to customer concerns and provide quick, helpful response suggestions.`,
   },
   {
     id: "general_assistant",
-    name: "General Assistant",
+    name: "通用助手",
     prompt: `You are a transparent AI assistant. Provide real-time help, insights, and information based on what you hear through system audio.
 
 [ADD YOUR PREFERENCES HERE]

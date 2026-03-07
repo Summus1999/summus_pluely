@@ -37,7 +37,7 @@ export const ChatAudio = ({
           variant="outline"
           onClick={handleMicClick}
           className="size-7 lg:size-9 rounded-lg lg:rounded-xl"
-          title={isRecording ? "Recording..." : "Voice input"}
+          title={isRecording ? "录制中..." : "语音输入"}
           disabled={disabled}
         >
           <MicIcon

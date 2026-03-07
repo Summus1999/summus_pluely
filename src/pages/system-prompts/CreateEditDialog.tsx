@@ -56,12 +56,12 @@ export const CreateEditDialog = ({
           <div className="flex items-center justify-between">
             <div>
               <DialogTitle>
-                {isEditing ? "Edit System Prompt" : "Create System Prompt"}
+                {isEditing ? "编辑系统提示词" : "创建系统提示词"}
               </DialogTitle>
               <DialogDescription className="mt-1">
                 {isEditing
-                  ? "Update your system prompt details below."
-                  : "Define a new AI behavior and personality."}
+                  ? "在下方更新你的系统提示词。"
+                  : "定义新的 AI 行为和风格。"}
               </DialogDescription>
             </div>
             <GenerateSystemPrompt onGenerate={onGenerate} />
@@ -70,10 +70,10 @@ export const CreateEditDialog = ({
         <div className="space-y-4 py-4 px-6 overflow-y-auto flex-1">
           <div className="space-y-2">
             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Name
+              名称
             </label>
             <Input
-              placeholder="e.g., Code Review Expert, Creative Writer..."
+              placeholder="例如：代码审查专家、创意写作助手..."
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               disabled={isSaving}
@@ -82,18 +82,17 @@ export const CreateEditDialog = ({
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              System Prompt
+              系统提示词
             </label>
             <Textarea
-              placeholder="You are a helpful AI assistant. Be concise, accurate, and friendly in your responses..."
+              placeholder="你是一个帮助开发岗位面试的 AI 助手。回答时使用中文，技术术语保持英文..."
               className="min-h-[200px] max-h-[400px] resize-none overflow-y-auto"
               value={form.prompt}
               onChange={(e) => setForm({ ...form, prompt: e.target.value })}
               disabled={isSaving}
             />
             <p className="text-xs text-muted-foreground/70">
-              💡 Tip: Be specific about tone, expertise level, and response
-              format
+              💡 提示：明确说明语气、专业程度和回答格式
             </p>
           </div>
         </div>
@@ -103,18 +102,18 @@ export const CreateEditDialog = ({
             onClick={() => onOpenChange(false)}
             disabled={isSaving}
           >
-            Cancel
+            取消
           </Button>
           <Button onClick={handleSave} disabled={!isFormValid || isSaving}>
             {isSaving ? (
               <>
                 <SparklesIcon className="h-4 w-4 animate-pulse" />
-                {isEditing ? "Updating..." : "Creating..."}
+                {isEditing ? "更新中..." : "创建中..."}
               </>
             ) : isEditing ? (
-              "Update"
+              "更新"
             ) : (
-              "Create"
+              "创建"
             )}
           </Button>
         </DialogFooter>

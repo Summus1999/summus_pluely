@@ -86,8 +86,8 @@ export const PermissionFlow = ({
   const stateConfig = {
     checking: {
       icon: <LoaderIcon className="w-5 h-5 animate-spin" />,
-      title: "Checking Permissions",
-      description: "Verifying system audio access...",
+      title: "检查权限中",
+      description: "正在验证系统音频访问权限...",
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200",
       textColor: "text-blue-800",
@@ -95,8 +95,8 @@ export const PermissionFlow = ({
     },
     granted: {
       icon: <CheckCircle2Icon className="w-5 h-5" />,
-      title: "Permission Granted",
-      description: "Starting capture...",
+      title: "权限已授予",
+      description: "正在启动采集...",
       bgColor: "bg-green-50",
       borderColor: "border-green-200",
       textColor: "text-green-800",
@@ -104,8 +104,8 @@ export const PermissionFlow = ({
     },
     requesting: {
       icon: <LoaderIcon className="w-5 h-5 animate-spin" />,
-      title: "Waiting for Permission",
-      description: `Enable Pluely in System Settings (${checkAttempts}/20)`,
+      title: "等待权限",
+      description: `在系统设置中启用 Pluely（${checkAttempts}/20）`,
       bgColor: "bg-orange-50",
       borderColor: "border-orange-200",
       textColor: "text-orange-800",
@@ -113,8 +113,8 @@ export const PermissionFlow = ({
     },
     denied: {
       icon: <ShieldAlertIcon className="w-5 h-5" />,
-      title: "Permission Required",
-      description: "Grant access to capture system audio",
+      title: "需要权限",
+      description: "授予系统音频采集权限",
       bgColor: "bg-muted/50",
       borderColor: "border-border",
       textColor: "text-muted-foreground",
@@ -145,14 +145,14 @@ export const PermissionFlow = ({
           {permissionState === "denied" && (
             <div className="mt-3 space-y-2">
               <Button onClick={requestPermission} size="sm" className="w-full">
-                Grant Permission
+                授予权限
               </Button>
               <button
                 type="button"
                 onClick={() => setShowManual(!showManual)}
                 className="w-full flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground"
               >
-                Manual setup
+                手动设置
                 <ChevronDownIcon
                   className={cn(
                     "w-3 h-3 transition-transform",
@@ -162,10 +162,10 @@ export const PermissionFlow = ({
               </button>
               {showManual && (
                 <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside pt-2 border-t border-border/50">
-                  <li>Open System Settings</li>
-                  <li>Go to Privacy & Security</li>
-                  <li>Select Screen & System Audio Recording</li>
-                  <li>Enable Pluely</li>
+                  <li>打开系统设置</li>
+                  <li>进入隐私与安全性</li>
+                  <li>选择屏幕与系统音频录制</li>
+                  <li>启用 Pluely</li>
                 </ol>
               )}
             </div>
@@ -179,7 +179,7 @@ export const PermissionFlow = ({
                 onClick={checkPermission}
                 className="text-xs"
               >
-                Check Now
+                立即检查
               </Button>
             </div>
           )}

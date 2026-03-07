@@ -34,8 +34,8 @@ const Audio = () => {
 
   return (
     <PageLayout
-      title="Audio Settings"
-      description="Configure your audio input and output devices for voice interaction and system audio capture."
+      title="音频设置"
+      description="配置语音交互和系统音频采集的输入输出设备。"
     >
       <AudioSelection />
 

@@ -15,12 +15,10 @@ export const Theme = () => {
   return (
     <div id="theme" className="relative space-y-3">
       <Header
-        title={`Theme Customization ${
-          hasActiveLicense
-            ? ""
-            : " (You need an active license to use this feature)"
+        title={`主题自定义${
+          hasActiveLicense ? "" : "（需要有效许可证才能使用此功能）"
         }`}
-        description="Personalize your experience with custom theme and transparency settings"
+        description="通过自定义主题和透明度设置个性化你的体验"
         isMainTitle
       />
 
@@ -37,24 +35,24 @@ export const Theme = () => {
                 {theme === "system" ? (
                   <>
                     <MonitorIcon className="h-4 w-4" />
-                    System
+                    跟随系统
                   </>
                 ) : theme === "light" ? (
                   <>
                     <SunIcon className="h-4 w-4" />
-                    Light Mode
+                    浅色模式
                   </>
                 ) : (
                   <>
                     <MoonIcon className="h-4 w-4" />
-                    Dark Mode
+                    深色模式
                   </>
                 )}
               </Label>
               <p className="text-xs text-muted-foreground mt-1">
                 {theme === "light"
-                  ? "Using light theme for better visibility in bright environments"
-                  : "Using dark theme for comfortable viewing in low light"}
+                  ? "使用浅色主题，在明亮环境下更清晰"
+                  : "使用深色主题，在弱光环境下更舒适"}
               </p>
             </div>
           </div>
@@ -73,13 +71,13 @@ export const Theme = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setTheme("light")}>
-                Light
+                浅色
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("dark")}>
-                Dark
+                深色
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("system")}>
-                System
+                跟随系统
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -93,8 +91,8 @@ export const Theme = () => {
         }`}
       >
         <Header
-          title="Window Transparency"
-          description="Adjust the transparency level of the application window"
+          title="窗口透明度"
+          description="调整应用窗口的透明度"
         />
         <div className="space-y-3">
           <div className="flex items-center gap-4 mt-4">
@@ -109,8 +107,7 @@ export const Theme = () => {
           </div>
 
           <p className="text-xs text-muted-foreground/70">
-            💡 Tip: Higher transparency lets you see through the window, perfect
-            for dark overlay. Changes apply immediately.
+            💡 提示：提高透明度可透视窗口，适合深色悬浮窗。修改立即生效。
           </p>
         </div>
       </div>

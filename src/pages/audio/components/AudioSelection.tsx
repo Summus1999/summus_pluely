@@ -135,8 +135,8 @@ export const AudioSelection = () => {
       {/* Microphone Input Section */}
       <div className="space-y-3">
         <Header
-          title="Microphone"
-          description="Select your microphone for voice input and speech-to-text. If issues occur, adjust your system's default microphone in OS settings."
+          title="麦克风"
+          description="选择用于语音输入和语音转文字的麦克风。如有问题，请在系统设置中调整默认麦克风。"
         />
 
         <div className="space-y-3">
@@ -187,7 +187,7 @@ export const AudioSelection = () => {
                 onClick={loadAudioDevices}
                 disabled={isLoadingDevices}
                 className="h-11 w-11 shrink-0"
-                title="Refresh microphone list"
+                title="刷新麦克风列表"
               >
                 <RefreshCwIcon
                   className={`size-4 ${isLoadingDevices ? "animate-spin" : ""}`}
@@ -231,8 +231,8 @@ export const AudioSelection = () => {
       {/* System Audio Output Section */}
       <div className="space-y-3">
         <Header
-          title="System Audio"
-          description="Select the output device to capture system sounds and application audio. If issues occur, set the correct default output in OS settings."
+          title="系统音频"
+          description="选择用于采集系统声音和应用音频的输出设备。如有问题，请在系统设置中设置正确的默认输出。"
         />
 
         <div className="space-y-3">
@@ -286,7 +286,7 @@ export const AudioSelection = () => {
                 onClick={loadAudioDevices}
                 disabled={isLoadingDevices}
                 className="h-11 w-11 shrink-0"
-                title="Refresh output device list"
+                title="刷新输出设备列表"
               >
                 <RefreshCwIcon
                   className={`size-4 ${isLoadingDevices ? "animate-spin" : ""}`}

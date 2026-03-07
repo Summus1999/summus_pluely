@@ -24,11 +24,11 @@ export const ScreenshotConfigs = ({
         <div className="space-y-2">
           <div className="flex flex-col">
             <Header
-              title="Capture Method"
+              title="截取方式"
               description={
                 screenshotConfiguration.enabled
-                  ? "Screenshot Mode: Quickly capture the entire screen with one click."
-                  : "Selection Mode: Click and drag to select a specific area to capture."
+                  ? "截图模式：一键快速截取整个屏幕。"
+                  : "选区模式：点击并拖动选择要截取的区域。"
               }
             />
           </div>
@@ -47,8 +47,8 @@ export const ScreenshotConfigs = ({
                 )}
                 <div className="text-sm font-medium">
                   {screenshotConfiguration.enabled
-                    ? "Screenshot Mode"
-                    : "Selection Mode"}
+                    ? "截图模式"
+                    : "选区模式"}
                 </div>
               </div>
             </SelectTrigger>
@@ -56,17 +56,17 @@ export const ScreenshotConfigs = ({
               <SelectItem value="selection" disabled={!hasActiveLicense}>
                 <div className="flex items-center gap-2">
                   <MousePointer2Icon className="size-4" />
-                  <div className="font-medium">Selection Mode</div>
+                  <div className="font-medium">选区模式</div>
                   {!hasActiveLicense && (
                     <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
-                      You need an active license to use Selection Mode.
+                      需要有效许可证才能使用选区模式。
                     </span>
                   )}
                 </div>
               </SelectItem>
               <SelectItem value="screenshot" className="flex flex-row gap-2">
                 <LaptopMinimalIcon className="size-4" />
-                <div className="font-medium">Screenshot Mode</div>
+                <div className="font-medium">截图模式</div>
               </SelectItem>
             </SelectContent>
           </Select>
@@ -76,11 +76,11 @@ export const ScreenshotConfigs = ({
         <div className="space-y-2">
           <div className="flex flex-col">
             <Header
-              title="Processing Mode"
+              title="处理模式"
               description={
                 screenshotConfiguration.mode === "manual"
-                  ? "Screenshots will be captured and automatically added to your attached files. You can then submit them with your own prompt. you can capture multiple screenshots and submit them later."
-                  : "Screenshots will be automatically submitted to AI using your custom prompt. No manual intervention required. only one screenshot can be submitted at a time."
+                  ? "截图将自动添加到附件中，你可稍后附带自己的提示词提交。可截取多张后一并提交。"
+                  : "截图将使用你的自定义提示词自动提交给 AI，无需手动操作。每次仅可提交一张截图。"
               }
             />
           </div>
@@ -91,17 +91,16 @@ export const ScreenshotConfigs = ({
             <SelectTrigger className="w-full h-11 border-1 border-input/50 focus:border-primary/50 transition-colors">
               <div className="flex items-center gap-2">
                 <div className="text-sm font-medium">
-                  {screenshotConfiguration.mode === "auto" ? "Auto" : "Manual"}{" "}
-                  Mode
+{screenshotConfiguration.mode === "auto" ? "自动" : "手动"}模式
                 </div>
               </div>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="manual">
-                <div className="font-medium">Manual Mode</div>
+                <div className="font-medium">手动模式</div>
               </SelectItem>
               <SelectItem value="auto">
-                <div className="font-medium">Auto Mode</div>
+                <div className="font-medium">自动模式</div>
               </SelectItem>
             </SelectContent>
           </Select>
@@ -110,15 +109,15 @@ export const ScreenshotConfigs = ({
         {/* Auto Prompt Input - Only show when auto mode is selected */}
         {screenshotConfiguration.mode === "auto" && (
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Auto Prompt</Label>
+            <Label className="text-sm font-medium">自动提示词</Label>
             <Input
-              placeholder="Enter prompt for automatic screenshot analysis..."
+              placeholder="输入截图自动分析时使用的提示词..."
               value={screenshotConfiguration.autoPrompt}
               onChange={(e) => handleScreenshotPromptChange(e.target.value)}
               className="w-full h-11 border-1 border-input/50 focus:border-primary/50 transition-colors"
             />
             <p className="text-xs text-muted-foreground">
-              This prompt will be used automatically when screenshots are taken
+              截图时将自动使用此提示词
             </p>
           </div>
         )}
@@ -127,12 +126,11 @@ export const ScreenshotConfigs = ({
       {/* Tips */}
       <div className="text-xs text-muted-foreground/70">
         <p>
-          💡 <strong>Tip:</strong>{" "}
+          💡 <strong>提示：</strong>{" "}
           {screenshotConfiguration.enabled
-            ? "Screenshot mode captures the full screen with one click."
-            : "Selection mode lets you choose specific areas to capture."}{" "}
-          Auto mode is great for quick analysis, manual mode gives you more
-          control.
+            ? "截图模式可一键截取整个屏幕。"
+            : "选区模式可选择特定区域截取。"}{" "}
+          自动模式适合快速分析，手动模式给予更多控制。
         </p>
       </div>
     </div>

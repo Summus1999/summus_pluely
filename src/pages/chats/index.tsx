@@ -28,16 +28,16 @@ const Dashboard = () => {
 
   return (
     <PageLayout
-      title="All conversations"
-      description="View all your conversations"
+      title="全部对话"
+      description="查看所有对话"
     >
       <>
         {conversations.conversations.length === 0 ? (
           <Empty
             isLoading={conversations.isLoading}
             icon={MessageCircleIcon}
-            title="No conversations found"
-            description="Start a new conversation to get started"
+            title="暂无对话"
+            description="开始新对话以使用"
           />
         ) : (
           <div className="flex flex-col gap-6 pb-8">
@@ -45,7 +45,7 @@ const Dashboard = () => {
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search conversations..."
+                placeholder="搜索对话..."
                 className="pl-9 focus-visible:ring-0 focus-visible:ring-offset-0"
                 value={conversations.search}
                 onChange={(e) => conversations.setSearch(e.target.value)}

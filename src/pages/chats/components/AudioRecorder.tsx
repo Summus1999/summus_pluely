@@ -202,7 +202,7 @@ export const AudioRecorder = ({
             onClick={handleStop}
             disabled={isTranscribing}
             className="h-8 w-8"
-            title="Stop recording"
+            title="停止录制"
           >
             <StopCircle className="h-4 w-4" />
           </Button>
@@ -211,7 +211,7 @@ export const AudioRecorder = ({
             onClick={handleSend}
             disabled={isTranscribing}
             className="h-8 w-8"
-            title={isTranscribing ? "Sending..." : "Send to AI"}
+            title={isTranscribing ? "发送中..." : "发送给 AI"}
           >
             <Send className="h-4 w-4" />
           </Button>

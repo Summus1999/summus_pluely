@@ -22,8 +22,8 @@ export const CursorSelection = ({ className }: CursorSelectionProps) => {
   return (
     <div id="cursor" className={`space-y-2 ${className}`}>
       <Header
-        title="Cursor"
-        description="Control pluely cursor visibility"
+        title="光标"
+        description="控制 Pluely 光标可见性"
         isMainTitle
         rightSlot={
           <Select
@@ -31,7 +31,7 @@ export const CursorSelection = ({ className }: CursorSelectionProps) => {
             onValueChange={(value) => setCursorType(value as CursorType)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select a cursor type" />
+              <SelectValue placeholder="选择光标类型" />
             </SelectTrigger>
             <SelectContent position="popper" align="end">
               <SelectItem value="invisible" disabled={platform === "linux"}>

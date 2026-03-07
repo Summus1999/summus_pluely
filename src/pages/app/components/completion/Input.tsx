@@ -49,7 +49,7 @@ export const Input = ({
           <div className="relative select-none">
             <InputComponent
               ref={inputRef}
-              placeholder="Ask me anything..."
+              placeholder="问我任何问题..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -96,17 +96,15 @@ export const Input = ({
           <div className="flex items-center justify-between px-4 py-2 border-b bg-muted/30">
             <div className="flex flex-row gap-1 items-center">
               <h3 className="font-semibold text-xs select-none">
-                {keepEngaged ? "Conversation Mode" : "AI Response"}
+                {keepEngaged ? "对话模式" : "AI 响应"}
               </h3>
               <div className="text-[10px] text-muted-foreground/70">
-                (Use arrow keys to scroll)
+                （使用方向键滚动）
               </div>
             </div>
             <div className="flex items-center gap-2 select-none">
               <div className="flex flex-row items-center gap-2 mr-2">
-                <p className="text-[10px]">{`Toggle ${
-                  keepEngaged ? "AI response" : "conversation mode"
-                }`}</p>
+                <p className="text-[10px]">{`切换${keepEngaged ? "AI 响应" : "对话模式"}`}</p>
                 <span className="text-[10px] text-muted-foreground/60 bg-muted/30 px-1 py-0 rounded border border-input/50">
                   {navigator.platform.toLowerCase().includes("mac")
                     ? "⌘"
@@ -142,10 +140,10 @@ export const Input = ({
                 className="cursor-pointer"
                 title={
                   isLoading
-                    ? "Cancel loading"
+                    ? "取消加载"
                     : keepEngaged
-                    ? "Close and start new conversation"
-                    : "Clear conversation"
+                    ? "关闭并开始新对话"
+                    : "清空对话"
                 }
               >
                 <XIcon />
@@ -157,13 +155,13 @@ export const Input = ({
             <div className="p-4">
               {error && (
                 <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded text-sm text-destructive">
-                  <strong>Error:</strong> {error}
+                  <strong>错误：</strong> {error}
                 </div>
               )}
               {isLoading && (
                 <div className="flex items-center gap-2 my-4 text-muted-foreground animate-pulse select-none">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">Generating response...</span>
+                  <span className="text-sm">正在生成响应...</span>
                 </div>
               )}
               {response && <Markdown>{response}</Markdown>}
@@ -188,7 +186,7 @@ export const Input = ({
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <span className="text-xs font-medium text-muted-foreground uppercase">
-                              {message.role === "user" ? "You" : "AI"}
+                              {message.role === "user" ? "你" : "AI"}
                             </span>
                             <span className="text-xs text-muted-foreground">
                               {new Date(message.timestamp).toLocaleTimeString(

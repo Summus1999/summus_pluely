@@ -23,8 +23,8 @@ export const AutoScrollToggle = () => {
   return (
     <div className="space-y-4">
       <Header
-        title="Auto-Scroll Behavior"
-        description="Control whether responses automatically scroll to the bottom. This setting applies immediately and controls whether responses automatically scroll to the latest content as it streams"
+        title="自动滚动"
+        description="控制响应是否自动滚动到底部。此设置立即生效，控制响应是否在流式输出时自动滚动到最新内容"
         isMainTitle
       />
 
@@ -32,12 +32,12 @@ export const AutoScrollToggle = () => {
         <div className="flex items-center space-x-3">
           <div>
             <Label className="text-sm font-medium">
-              {autoScroll ? "Auto-Scroll Enabled" : "Auto-Scroll Disabled"}
+              {autoScroll ? "已启用自动滚动" : "已禁用自动滚动"}
             </Label>
             <p className="text-xs text-muted-foreground mt-1">
               {autoScroll
-                ? "Responses will automatically scroll to the bottom as they arrive"
-                : "Responses will stay at your current scroll position"}
+                ? "响应将自动滚动到底部"
+                : "响应将保持在当前滚动位置"}
             </p>
           </div>
         </div>
@@ -45,10 +45,8 @@ export const AutoScrollToggle = () => {
           checked={autoScroll}
           onCheckedChange={handleSwitchChange}
           disabled={!hasActiveLicense}
-          title={`Toggle to ${!autoScroll ? "enable" : "disable"} auto-scroll`}
-          aria-label={`Toggle to ${
-            autoScroll ? "disable" : "enable"
-          } auto-scroll`}
+          title={`切换${!autoScroll ? "启用" : "禁用"}自动滚动`}
+          aria-label={`切换${autoScroll ? "禁用" : "启用"}自动滚动`}
         />
       </div>
     </div>

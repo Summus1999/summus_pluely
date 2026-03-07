@@ -18,8 +18,8 @@ export const CustomProviders = ({ allSttProviders }: UseSettingsReturn) => {
   return (
     <div className="space-y-2">
       <Header
-        title="Custom STT Providers"
-        description="Create and manage custom STT providers. Configure endpoints, authentication, and response formats."
+        title="自定义 STT 提供商"
+        description="创建和管理自定义 STT 提供商。配置端点、认证和响应格式。"
       />
 
       <div className="space-y-2">
@@ -45,15 +45,15 @@ export const CustomProviders = ({ allSttProviders }: UseSettingsReturn) => {
 
                         <div className="flex items-center gap-2 mt-1">
                           <p className="text-xs text-muted-foreground">
-                            {`Response Path: ${
-                              provider?.responseContentPath || "Not set"
+                            {`响应路径：${
+                              provider?.responseContentPath || "未设置"
                             }`}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {" • "}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            Streaming: {provider?.streaming ? "Yes" : "No"}
+                            流式：{provider?.streaming ? "是" : "否"}
                           </p>
                         </div>
                       </div>
@@ -64,7 +64,7 @@ export const CustomProviders = ({ allSttProviders }: UseSettingsReturn) => {
                           onClick={() =>
                             provider?.id && handleEdit(provider?.id)
                           }
-                          title="Edit Provider"
+                          title="编辑提供商"
                         >
                           <EditIcon className="h-3 w-3" />
                         </Button>
@@ -74,7 +74,7 @@ export const CustomProviders = ({ allSttProviders }: UseSettingsReturn) => {
                           onClick={() =>
                             provider?.id && handleDelete(provider?.id)
                           }
-                          title="Delete Provider"
+                          title="删除提供商"
                           className="text-destructive hover:text-destructive"
                         >
                           <TrashIcon className="h-3 w-3" />
@@ -94,18 +94,17 @@ export const CustomProviders = ({ allSttProviders }: UseSettingsReturn) => {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-background border rounded-lg p-6 max-w-md mx-4">
             <h3 className="text-lg font-semibold mb-2">
-              Delete Custom STT Provider
+              删除自定义 STT 提供商
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Are you sure you want to delete this custom STT provider? This
-              action cannot be undone.
+              确定要删除此自定义 STT 提供商吗？此操作不可撤销。
             </p>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={cancelDelete}>
-                Cancel
+                取消
               </Button>
               <Button variant="destructive" onClick={confirmDelete}>
-                Delete
+                删除
               </Button>
             </div>
           </div>

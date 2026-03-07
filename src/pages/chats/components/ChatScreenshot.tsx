@@ -22,8 +22,8 @@ export const ChatScreenshot = ({
 }: ChatScreenshotProps) => {
   const { supportsImages } = useApp();
   const captureMode = screenshotConfiguration.enabled
-    ? "Screenshot"
-    : "Selection";
+    ? "截图"
+    : "选区";
   const processingMode = screenshotConfiguration.mode;
 
   return (
@@ -33,8 +33,8 @@ export const ChatScreenshot = ({
       className="size-7 lg:size-9 rounded-lg lg:rounded-xl"
       title={
         !supportsImages
-          ? "Screenshot not supported by current AI provider"
-          : `${captureMode} mode (${processingMode}) - ${attachedFiles.length}/${MAX_FILES} files`
+          ? "当前 AI 提供商不支持截图"
+          : `${captureMode} 模式（${processingMode}）- ${attachedFiles.length}/${MAX_FILES} 个文件`
       }
       onClick={captureScreenshot}
       disabled={

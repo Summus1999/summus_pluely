@@ -43,8 +43,8 @@ export const Providers = ({
     <div className="space-y-3">
       <div className="space-y-2">
         <Header
-          title="Select STT Provider"
-          description="Select your preferred STT service provider or custom providers to get started."
+          title="选择 STT 提供商"
+          description="选择你偏好的 STT 服务提供商或自定义提供商以开始使用。"
         />
         <Selection
           selected={selectedSttProvider?.provider}
@@ -52,13 +52,13 @@ export const Providers = ({
             const json = curl2Json(provider?.curl);
             return {
               label: provider?.isCustom
-                ? json?.url || "Custom Provider"
-                : provider?.id || "Custom Provider",
-              value: provider?.id || "Custom Provider",
+                ? json?.url || "自定义提供商"
+                : provider?.id || "自定义提供商",
+              value: provider?.id || "自定义提供商",
               isCustom: provider?.isCustom,
             };
           })}
-          placeholder="Choose your STT provider"
+          placeholder="选择 STT 提供商"
           onChange={(value) => {
             onSetSelectedSttProvider({
               provider: value,
@@ -69,23 +69,23 @@ export const Providers = ({
       </div>
       {localSelectedProvider ? (
         <Header
-          title={`Method: ${
-            localSelectedProvider?.method || "Invalid"
-          }, Endpoint: ${localSelectedProvider?.url || "Invalid"}`}
-          description={`If you want to use different url or method, you can always create a custom provider.`}
+          title={`方法：${
+            localSelectedProvider?.method || "无效"
+          }，端点：${localSelectedProvider?.url || "无效"}`}
+          description={`如需使用不同的 URL 或方法，可创建自定义提供商。`}
         />
       ) : null}
       {findKeyAndValue("api_key") ? (
         <div className="space-y-2">
           <Header
             title="API Key"
-            description={`Enter your ${
+            description={`输入你的 ${
               allSttProviders?.find(
                 (p) => p?.id === selectedSttProvider?.provider
               )?.isCustom
-                ? "Custom Provider"
+                ? "自定义提供商"
                 : selectedSttProvider?.provider
-            } API key to authenticate and access STT models. Your key is stored locally and never shared.`}
+            } API Key 以验证并访问 STT 模型。密钥仅存储在本地，不会共享。`}
           />
 
           <div className="space-y-2">
@@ -140,7 +140,7 @@ export const Providers = ({
                   disabled={isApiKeyEmpty()}
                   size="icon"
                   className="shrink-0 h-11 w-11"
-                  title="Submit API Key"
+                  title="提交 API Key"
                 >
                   <KeyIcon className="h-4 w-4" />
                 </Button>
@@ -161,7 +161,7 @@ export const Providers = ({
                   size="icon"
                   variant="destructive"
                   className="shrink-0 h-11 w-11"
-                  title="Remove API Key"
+                  title="移除 API Key"
                 >
                   <TrashIcon className="h-4 w-4" />
                 </Button>
@@ -186,25 +186,22 @@ export const Providers = ({
               <div className="space-y-1" key={variable?.key}>
                 <Header
                   title={variable?.value || ""}
-                  description={`add your preferred ${variable?.key?.replace(
-                    /_/g,
-                    " "
-                  )} for ${
+                  description={`为 ${
                     allSttProviders?.find(
                       (p) => p?.id === selectedSttProvider?.provider
                     )?.isCustom
-                      ? "Custom Provider"
+                      ? "自定义提供商"
                       : selectedSttProvider?.provider
-                  }`}
+                  } 添加 ${variable?.key?.replace(/_/g, " ")}`}
                 />
                 <TextInput
-                  placeholder={`Enter ${
+                  placeholder={`输入 ${
                     allSttProviders?.find(
                       (p) => p?.id === selectedSttProvider?.provider
                     )?.isCustom
-                      ? "Custom Provider"
+                      ? "自定义提供商"
                       : selectedSttProvider?.provider
-                  } ${variable?.key?.replace(/_/g, " ") || "value"}`}
+                  } 的 ${variable?.key?.replace(/_/g, " ") || "值"}`}
                   value={getVariableValue()}
                   onChange={(value) => {
                     if (!variable?.key || !selectedSttProvider) return;

@@ -8,7 +8,7 @@ import { PageLayout } from "@/layouts";
 
 const Settings = () => {
   return (
-    <PageLayout title="Settings" description="Manage your settings">
+    <PageLayout title="设置" description="管理你的设置">
       {/* Theme */}
       <Theme />
 

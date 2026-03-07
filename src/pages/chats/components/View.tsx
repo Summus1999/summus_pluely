@@ -86,12 +86,12 @@ const View = () => {
       isMainTitle={false}
       allowBackButton={true}
       title={messages?.title || ""}
-      description={`${messages?.messages.length} messages in this conversation`}
+      description={`本对话共 ${messages?.messages.length} 条消息`}
       rightSlot={
         <div className="flex flex-row items-center gap-2">
           <Button
             variant="outline"
-            title="Open this conversation in overlay"
+            title="在悬浮窗中打开此对话"
             className="text-[10px] lg:text-sm h-6 lg:h-8"
             onClick={() =>
               conversationId && handleAttachToOverlay(conversationId)
@@ -112,7 +112,7 @@ const View = () => {
           </Button>
           <Button
             variant={"outline"}
-            title="Download conversation as markdown"
+            title="下载对话为 Markdown"
             className="text-[10px] lg:text-sm h-6 lg:h-8"
             onClick={(e) => handleDownload(messages, e)}
             disabled={isDownloaded}
@@ -130,7 +130,7 @@ const View = () => {
           </Button>
           <Button
             variant="destructive"
-            title="Delete conversation"
+            title="删除对话"
             onClick={() =>
               conversationId && handleDeleteConfirm(conversationId)
             }
@@ -145,8 +145,8 @@ const View = () => {
         <Empty
           isLoading={false}
           icon={MessageCircleIcon}
-          title="No messages found"
-          description="Start a new message to get started"
+          title="暂无消息"
+          description="发送新消息以开始"
         />
       ) : (
         <div className="flex flex-col gap-4 pb-24 px-2">
@@ -291,7 +291,7 @@ const View = () => {
 
                 <Textarea
                   ref={completion.inputRef}
-                  placeholder="Type a message..."
+                  placeholder="输入消息..."
                   className="pr-12 pl-2 resize-none pb-12 pt-3"
                   rows={2}
                   value={completion.input}
@@ -303,7 +303,7 @@ const View = () => {
                 <Button
                   size="icon"
                   className="size-7 lg:size-9 rounded-lg lg:rounded-xl absolute right-2 bottom-2"
-                  title="Send message"
+                  title="发送消息"
                   onClick={() => completion.submit()}
                   disabled={
                     completion.isLoading ||

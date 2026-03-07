@@ -15,8 +15,8 @@ export const AppIconToggle = ({ className }: AppIconToggleProps) => {
   return (
     <div id="app-icon" className={`space-y-2 ${className}`}>
       <Header
-        title="App Icon Stealth Mode"
-        description="Control dock/taskbar icon visibility when window is hidden for maximum discretion"
+        title="应用图标隐藏模式"
+        description="控制窗口隐藏时 Dock/任务栏图标的可见性，实现最大隐蔽性"
         isMainTitle
       />
       <div className="flex items-center justify-between">
@@ -24,20 +24,18 @@ export const AppIconToggle = ({ className }: AppIconToggleProps) => {
           <div>
             <Label className="text-sm font-medium">
               {!customizable.appIcon.isVisible
-                ? "Show Icon in Dock/Taskbar"
-                : "Hide Icon from Dock/Taskbar"}
+                ? "在 Dock/任务栏显示图标"
+                : "从 Dock/任务栏隐藏图标"}
             </Label>
             <p className="text-xs text-muted-foreground mt-1">
-              {`Toggle to make App Icon ${
-                !customizable.appIcon.isVisible ? "Visible" : "Hidden"
-              }`}
+              {`切换应用图标${!customizable.appIcon.isVisible ? "显示" : "隐藏"}`}
             </p>
           </div>
         </div>
         <Switch
           checked={customizable.appIcon.isVisible}
           onCheckedChange={handleSwitchChange}
-          aria-label="Toggle app icon visibility"
+          aria-label="切换应用图标可见性"
         />
       </div>
     </div>

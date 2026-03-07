@@ -47,7 +47,7 @@ export const CreateEditProvider = ({
           className="w-full h-11 border-1 border-input/50 focus:border-primary/50 transition-colors"
         >
           <PlusIcon className="h-4 w-4 mr-2" />
-          Add Custom STT Provider
+          添加自定义 STT 提供商
         </Button>
       ) : (
         <Card className="p-4 border border-input/50 bg-transparent">
@@ -55,10 +55,10 @@ export const CreateEditProvider = ({
             <Header
               title={
                 editingProvider
-                  ? `Edit STT Provider`
-                  : "Add Custom STT Provider"
+                  ? `编辑 STT 提供商`
+                  : "添加自定义 STT 提供商"
               }
-              description="Create a custom STT provider to use with your STT-powered applications."
+              description="创建自定义 STT 提供商以用于 STT 应用。"
             />
             <div className="w-[120px]">
               <Selection
@@ -70,7 +70,7 @@ export const CreateEditProvider = ({
                       value: provider?.id || "STT Provider",
                     };
                   })}
-                placeholder={"Auto-fill"}
+                placeholder={"自动填充"}
                 onChange={(value) => {
                   handleAutoFill(value);
                 }}
@@ -82,8 +82,8 @@ export const CreateEditProvider = ({
             {/* Basic Configuration */}
             <div className="space-y-1">
               <Header
-                title="Curl Command *"
-                description="The curl command to use with the STT provider."
+                title="Curl 命令 *"
+                description="用于 STT 提供商的 curl 命令。"
               />
               <Textarea
                 className={cn(
@@ -174,7 +174,7 @@ export const CreateEditProvider = ({
             <div className="flex justify-between items-center space-x-2">
               <Header
                 title="Streaming"
-                description="streaming is used to stream the response from the AI provider."
+                description="用于从 AI 提供商流式获取响应。"
               />
               <Switch
                 checked={formData.streaming}
@@ -188,15 +188,14 @@ export const CreateEditProvider = ({
               />
             </div>
             <span className="text-xs italic text-red-500">
-              Streaming is not supported for STT providers. it will be fixed in
-              the future.
+              STT 提供商暂不支持 Streaming，未来将修复。
             </span>
           </div>
           {/* Response Configuration */}
           <div className="space-y-2">
             <Header
-              title="Response Content Path *"
-              description="The path to extract content from the API response."
+              title="响应内容路径 *"
+              description="从 API 响应中提取内容的路径。"
             />
 
             <TextInput
@@ -219,7 +218,7 @@ export const CreateEditProvider = ({
               onClick={() => setShowForm(!showForm)}
               className="h-11 border-1 border-input/50 focus:border-primary/50 transition-colors"
             >
-              Cancel
+              取消
             </Button>
             <Button
               onClick={handleSave}
@@ -230,11 +229,11 @@ export const CreateEditProvider = ({
               )}
             >
               {errors.curl ? (
-                "Invalid cURL, try again"
+                "cURL 无效，请重试"
               ) : (
                 <>
                   <SaveIcon className="h-4 w-4 mr-2" />
-                  {editingProvider ? "Update" : "Save"} Provider
+                  {editingProvider ? "更新" : "保存"}提供商
                 </>
               )}
             </Button>

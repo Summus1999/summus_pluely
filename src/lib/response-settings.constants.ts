@@ -15,26 +15,24 @@ export interface LanguageOption {
 export const RESPONSE_LENGTHS: ResponseLengthOption[] = [
   {
     id: "short",
-    title: "Short",
-    description:
-      "Best for quick answers, summaries, and when you need to save time",
+    title: "简短",
+    description: "适合快速回答、总结，以及需要节省时间的场景",
     prompt:
-      "IMPORTANT: You must keep your response extremely brief and concise. Limit your answer to 2-4 sentences maximum. Provide only the most essential information. Do not include explanations, examples, or additional context unless explicitly requested. Get straight to the point. This is a strict requirement.",
+      "重要：你必须保持回答极其简洁。将答案限制在 2-4 句话以内。只提供最核心的信息。除非明确要求，否则不要包含解释、示例或额外背景。直击要点。这是严格要求。",
   },
   {
     id: "medium",
-    title: "Medium",
-    description: "Balanced responses with adequate explanations for most tasks",
+    title: "适中",
+    description: "平衡的回答，适合大多数任务",
     prompt:
-      "IMPORTANT: Provide responses with moderate length - not too brief, not too lengthy. Keep your answer to 1-2 paragraphs (approximately 4-8 sentences). Include key explanations and relevant details, but avoid being overly verbose or adding unnecessary elaboration. Stay focused and well-organized. This is a strict requirement.",
+      "重要：提供适中长度的回答，既不太简短也不太冗长。保持 1-2 段（约 4-8 句话）。包含关键解释和相关细节，但避免过于啰嗦或添加不必要的阐述。保持专注和有条理。这是严格要求。",
   },
   {
     id: "auto",
-    title: "Auto",
-    description:
-      "AI determines the best length based on your question's complexity",
+    title: "自动",
+    description: "AI 根据问题复杂度自动决定最佳长度",
     prompt:
-      "IMPORTANT: Carefully assess the complexity and scope of the question, then adjust your response length accordingly. For simple questions, be brief (2-4 sentences). For moderate questions, provide balanced detail (1-2 paragraphs). For complex questions, give comprehensive answers with appropriate depth. Always match the response length to what the question actually requires - no more, no less.",
+      "重要：仔细评估问题的复杂度和范围，然后相应调整回答长度。简单问题简短回答（2-4 句）。中等复杂度问题提供平衡的细节（1-2 段）。复杂问题给出全面且有深度的回答。始终使回答长度与问题实际需求相匹配，不多不少。",
   },
 ];
 
@@ -89,9 +87,9 @@ export const LANGUAGES: LanguageOption[] = [
   },
   {
     id: "chinese",
-    name: "Chinese",
+    name: "中文",
     flag: "🇨🇳",
-    prompt: "Respond in Simplified Chinese (简体中文).",
+    prompt: "使用简体中文回答，技术术语保持英文。",
   },
   {
     id: "japanese",
@@ -216,5 +214,5 @@ export const LANGUAGES: LanguageOption[] = [
 ];
 
 export const DEFAULT_RESPONSE_LENGTH = "auto";
-export const DEFAULT_LANGUAGE = "english";
+export const DEFAULT_LANGUAGE = "chinese";
 export const DEFAULT_AUTO_SCROLL = true;

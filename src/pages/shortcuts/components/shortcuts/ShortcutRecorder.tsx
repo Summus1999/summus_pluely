@@ -79,7 +79,7 @@ export const ShortcutRecorder = ({
       if (isMoveWindow) {
         if (["up", "down", "left", "right"].includes(mainKey)) {
           setError(
-            "Arrow keys are automatic for Move Window. Only set modifiers."
+            "移动窗口时方向键自动生效，仅需设置修饰键。"
           );
           return;
         }
@@ -87,7 +87,7 @@ export const ShortcutRecorder = ({
           setRecordedKeys(keys);
           setError("");
         } else {
-          setError("Must include at least one modifier (Cmd/Ctrl/Alt/Shift)");
+          setError("必须包含至少一个修饰键（Cmd/Ctrl/Alt/Shift）");
         }
       } else {
         if (!["control", "alt", "shift", "meta"].includes(mainKey)) {
@@ -99,7 +99,7 @@ export const ShortcutRecorder = ({
           setError("");
         } else {
           setError(
-            "Must include at least one modifier (Cmd/Ctrl/Alt/Shift) and one key"
+            "必须包含至少一个修饰键和一个按键"
           );
         }
       }
@@ -135,8 +135,8 @@ export const ShortcutRecorder = ({
     if (recordedKeys.length < minKeys) {
       setError(
         isMoveWindow
-          ? "Move Window needs at least one modifier"
-          : "Shortcut must have at least one modifier and one key"
+          ? "移动窗口需要至少一个修饰键"
+          : "快捷键必须包含至少一个修饰键和一个按键"
       );
       return;
     }
@@ -147,7 +147,7 @@ export const ShortcutRecorder = ({
     if (!isMoveWindow) {
       // Validate with frontend
       if (!validateShortcutKey(shortcutKey)) {
-        setError("Invalid shortcut combination");
+        setError("无效的快捷键组合");
         return;
       }
 
@@ -158,11 +158,11 @@ export const ShortcutRecorder = ({
         });
 
         if (!isValid) {
-          setError("This shortcut combination is not supported");
+          setError("此快捷键组合不受支持");
           return;
         }
       } catch (e) {
-        setError("Failed to validate shortcut");
+        setError("验证快捷键失败");
         return;
       }
     }
@@ -179,7 +179,7 @@ export const ShortcutRecorder = ({
   const displayKey =
     recordedKeys.length > 0
       ? formatShortcutKeyForDisplay(recordedKeys.join("+"))
-      : "Waiting for keys...";
+      : "等待按键...";
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -201,20 +201,20 @@ export const ShortcutRecorder = ({
           variant="default"
           onClick={handleSave}
           disabled={disabled || recordedKeys.length < minKeys}
-          title="Save shortcut"
+          title="保存快捷键"
         >
           <Check className="h-4 w-4" />
-          Save
+          保存
         </Button>
         <Button
           size="sm"
           variant="outline"
           onClick={handleCancel}
           disabled={disabled}
-          title="Cancel"
+          title="取消"
         >
           <X className="h-4 w-4" />
-          Cancel
+          取消
         </Button>
       </div>
 
@@ -223,14 +223,14 @@ export const ShortcutRecorder = ({
       {isRecording && !error && (
         <p className="text-xs text-muted-foreground">
           {isMoveWindow
-            ? "Press modifier keys (e.g., Cmd+Shift). Arrow keys work automatically."
-            : "Press a key combination now (e.g., Cmd+Shift+K)"}
+            ? "按下修饰键（如 Cmd+Shift）。方向键自动生效。"
+            : "现在按下按键组合（如 Cmd+Shift+K）"}
         </p>
       )}
 
       {recordedKeys.length >= minKeys && !error && (
         <p className="text-xs text-green-600">
-          ✓ Shortcut captured! Click "Save" to apply.
+          ✓ 已捕获快捷键！点击「保存」应用。
         </p>
       )}
     </div>
