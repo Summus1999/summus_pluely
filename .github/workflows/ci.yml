@@ -41,15 +41,19 @@ jobs:
           - platform: macos-latest
             args: "--target aarch64-apple-darwin"
             artifact_name: pluely-macos-arm64
+            bundle_path: src-tauri/target/aarch64-apple-darwin/release/bundle/
           - platform: macos-latest
             args: "--target x86_64-apple-darwin"
             artifact_name: pluely-macos-x64
+            bundle_path: src-tauri/target/x86_64-apple-darwin/release/bundle/
           - platform: ubuntu-22.04
             args: ""
             artifact_name: pluely-linux
+            bundle_path: src-tauri/target/release/bundle/
           - platform: windows-latest
             args: ""
             artifact_name: pluely-windows
+            bundle_path: src-tauri/target/release/bundle/
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -98,4 +102,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: src-tauri/target/release/bundle/
+          path: ${{ matrix.bundle_path }}
