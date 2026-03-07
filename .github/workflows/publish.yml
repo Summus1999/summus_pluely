@@ -18,12 +18,16 @@ jobs:
         include:
           - platform: macos-latest
             args: "--target aarch64-apple-darwin"
+            artifact_name: pluely-macos-arm64
           - platform: macos-latest
             args: "--target x86_64-apple-darwin"
+            artifact_name: pluely-macos-x64
           - platform: ubuntu-22.04
             args: ""
+            artifact_name: pluely-linux
           - platform: windows-latest
             args: ""
+            artifact_name: pluely-windows
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -79,3 +83,9 @@ jobs:
           includeUpdaterJson: true
           updaterJsonPreferNsis: true
           args: ${{ matrix.args }}
+
+      - name: Upload installers as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: src-tauri/target/release/bundle/
