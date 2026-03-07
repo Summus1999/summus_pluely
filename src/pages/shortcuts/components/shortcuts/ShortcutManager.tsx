@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Button, Card, GetLicense, Switch } from "@/components";
-import { RotateCcw, AlertCircle, Keyboard, Lock } from "lucide-react";
+import { Button, Card, Switch } from "@/components";
+import { RotateCcw, AlertCircle, Keyboard } from "lucide-react";
 import {
   getAllShortcutActions,
   getShortcutsConfig,
@@ -25,11 +25,11 @@ export const ShortcutManager = () => {
 
   useEffect(() => {
     loadShortcuts();
-  }, [hasActiveLicense]);
+  }, []);
 
   const loadShortcuts = () => {
     const config = getShortcutsConfig();
-    const allActions = getAllShortcutActions(hasActiveLicense);
+    const allActions = getAllShortcutActions(true);
     setActions(allActions);
     setBindings(config.bindings);
   };
@@ -129,7 +129,6 @@ export const ShortcutManager = () => {
           </h3>
           <p className="text-sm text-muted-foreground">
             已配置 {actions.length} 个快捷键
-            {!hasActiveLicense && " • 获取许可证以自定义快捷键"}
           </p>
         </div>
         <div className="flex gap-2">
@@ -175,27 +174,6 @@ export const ShortcutManager = () => {
         </div>
       )}
 
-      {/* License Prompt for Non-Licensed Users */}
-      {!hasActiveLicense && (
-        <Card className="p-4 bg-primary/5 border-primary/20">
-          <div className="flex items-start gap-3">
-            <Lock className="size-4 lg:size-5 text-primary mt-0.5" />
-            <div className="flex-1 space-y-2">
-              <p className="text-xs lg:text-sm font-medium">
-                解锁快捷键自定义
-              </p>
-              <p className="text-[10px] lg:text-xs text-muted-foreground">
-                可启用/禁用快捷键，但需要有效许可证才能自定义按键绑定。
-              </p>
-              <GetLicense
-                buttonText="获取许可证"
-                buttonClassName="w-full mt-2"
-              />
-            </div>
-          </div>
-        </Card>
-      )}
-
       {/* Flat Shortcuts List */}
       <div className="space-y-3">
         {actions.map((action) => {
@@ -204,7 +182,7 @@ export const ShortcutManager = () => {
             key: getPlatformDefaultKey(action),
             enabled: true,
           };
-          const isLocked = !hasActiveLicense;
+          const isLocked = false;
           const isEditing = editingAction === action.id;
 
           return (
@@ -253,9 +231,6 @@ export const ShortcutManager = () => {
                       <p className="font-medium text-xs lg:text-sm">
                         {action.name}
                       </p>
-                      {isLocked && (
-                        <Lock className="size-3 lg:size-4 text-muted-foreground" />
-                      )}
                     </div>
                     <p className="text-[10px] lg:text-xs text-muted-foreground">
                       {action.description}
