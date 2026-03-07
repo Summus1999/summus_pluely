@@ -1,4 +1,4 @@
-export * from "./updater";
+// export * from "./updater";  // Disabled: auto-updater not configured
 export * from "./ui";
 export * from "./Markdown";
 export * from "./Header";

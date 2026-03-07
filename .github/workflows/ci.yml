@@ -1,17 +1,39 @@
-name: Publish
+name: CI
 
-# Trigger on every push to main/master or manual run
 on:
+  pull_request:
+    branches:
+      - master
+      - main
   push:
     branches:
       - master
       - main
-  workflow_dispatch:
 
 jobs:
-  publish-tauri:
+  check-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build frontend
+        run: npm run build
+
+  build-tauri:
     permissions:
-      contents: write
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -61,21 +83,9 @@ jobs:
       - name: Install frontend deps
         run: npm ci
 
-      - name: Build & publish
+      - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0.5.25
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: app-v__VERSION__
-          releaseName: "Pluely v__VERSION__"
-          releaseBody: |
-            Download binaries for your OS.
-            macOS users: If blocked, go to System Settings > Privacy & Security > Security section,
-            find 'pluely was blocked' message, click 'Allow Anyway', then reopen the app.
-          releaseDraft: true
-          prerelease: false
-          includeUpdaterJson: true
-          updaterJsonPreferNsis: true
           args: ${{ matrix.args }}
