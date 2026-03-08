@@ -1,0 +1,795 @@
+diff --git a/src/config/ai-providers.constants.ts b/src/config/ai-providers.constants.ts
+index c0b1461..1687494 100644
+--- a/src/config/ai-providers.constants.ts
++++ b/src/config/ai-providers.constants.ts
+@@ -130,4 +130,76 @@ export const AI_PROVIDERS = [
+     responseContentPath: "choices[0].message.content",
+     streaming: true,
+   },
++  {
++    id: "siliconflow",
++    curl: `curl -X POST https://api.siliconflow.cn/v1/chat/completions \\
++    -H "Content-Type: application/json" \\
++    -H "Authorization: Bearer {{API_KEY}}" \\
++    -d '{
++    "model": "{{MODEL}}",
++    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
++  }'`,
++    responseContentPath: "choices[0].message.content",
++    streaming: true,
++  },
++  {
++    id: "deepseek",
++    curl: `curl -X POST https://api.deepseek.com/chat/completions \\
++    -H "Content-Type: application/json" \\
++    -H "Authorization: Bearer {{API_KEY}}" \\
++    -d '{
++    "model": "{{MODEL}}",
++    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
++  }'`,
++    responseContentPath: "choices[0].message.content",
++    streaming: true,
++  },
++  {
++    id: "zhipu",
++    curl: `curl -X POST https://open.bigmodel.cn/api/paas/v4/chat/completions \\
++    -H "Content-Type: application/json" \\
++    -H "Authorization: Bearer {{API_KEY}}" \\
++    -d '{
++    "model": "{{MODEL}}",
++    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
++  }'`,
++    responseContentPath: "choices[0].message.content",
++    streaming: true,
++  },
++  {
++    id: "moonshot",
++    curl: `curl -X POST https://api.moonshot.cn/v1/chat/completions \\
++    -H "Content-Type: application/json" \\
++    -H "Authorization: Bearer {{API_KEY}}" \\
++    -d '{
++    "model": "{{MODEL}}",
++    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
++  }'`,
++    responseContentPath: "choices[0].message.content",
++    streaming: true,
++  },
++  {
++    id: "qwen",
++    curl: `curl -X POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions \\
++    -H "Content-Type: application/json" \\
++    -H "Authorization: Bearer {{API_KEY}}" \\
++    -d '{
++    "model": "{{MODEL}}",
++    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
++  }'`,
++    responseContentPath: "choices[0].message.content",
++    streaming: true,
++  },
++  {
++    id: "baichuan",
++    curl: `curl -X POST https://api.baichuan-ai.com/v1/chat/completions \\
++    -H "Content-Type: application/json" \\
++    -H "Authorization: Bearer {{API_KEY}}" \\
++    -d '{
++    "model": "{{MODEL}}",
++    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
++  }'`,
++    responseContentPath: "choices[0].message.content",
++    streaming: true,
++  },
+ ];
+diff --git a/src/config/stt.constants.ts b/src/config/stt.constants.ts
+index 95b4cc9..50abb1b 100644
+--- a/src/config/stt.constants.ts
++++ b/src/config/stt.constants.ts
+@@ -102,4 +102,14 @@ export const SPEECH_TO_TEXT_PROVIDERS = [
+     responseContentPath: "results[0].alternatives[0].transcript",
+     streaming: false,
+   },
++  {
++    id: "siliconflow-whisper",
++    name: "硅基流动 Whisper",
++    curl: `curl -X POST "https://api.siliconflow.cn/v1/audio/transcriptions" \\
++      -H "Authorization: Bearer {{API_KEY}}" \\
++      -F "file={{AUDIO}}" \\
++      -F "model={{MODEL}}"`,
++    responseContentPath: "text",
++    streaming: false,
++  },
+ ];
+diff --git a/src/hooks/useChatCompletion.ts b/src/hooks/useChatCompletion.ts
+index 65fda71..75b5d58 100644
+--- a/src/hooks/useChatCompletion.ts
++++ b/src/hooks/useChatCompletion.ts
+@@ -286,7 +286,7 @@ export const useChatCompletion = (
+             setState((prev) => ({
+               ...prev,
+               isLoading: false,
+-              error: e.message || "An error occurred",
++              error: e.message || "发生错误",
+             }));
+           }
+           return;
+@@ -368,7 +368,7 @@ export const useChatCompletion = (
+         if (!signal?.aborted && currentRequestIdRef.current === requestId) {
+           setState((prev) => ({
+             ...prev,
+-            error: error instanceof Error ? error.message : "An error occurred",
++            error: error instanceof Error ? error.message : "发生错误",
+             isLoading: false,
+           }));
+         }
+@@ -429,7 +429,7 @@ export const useChatCompletion = (
+       if (state.attachedFiles.length >= MAX_FILES) {
+         setState((prev) => ({
+           ...prev,
+-          error: `You can only upload ${MAX_FILES} files`,
++          error: `最多只能上传 ${MAX_FILES} 个文件`,
+         }));
+         return;
+       }
+@@ -476,7 +476,7 @@ export const useChatCompletion = (
+           error:
+             error instanceof Error
+               ? error.message
+-              : "An error occurred processing screenshot",
++              : "处理截图时发生错误",
+           isLoading: false,
+         }));
+       }
+diff --git a/src/hooks/useCompletion.ts b/src/hooks/useCompletion.ts
+index 5ac75c5..75c850d 100644
+--- a/src/hooks/useCompletion.ts
++++ b/src/hooks/useCompletion.ts
+@@ -241,7 +241,7 @@ export const useCompletion = () => {
+             setState((prev) => ({
+               ...prev,
+               isLoading: false,
+-              error: e.message || "An error occurred",
++              error: e.message || "发生错误",
+             }));
+           }
+           return;
+@@ -278,7 +278,7 @@ export const useCompletion = () => {
+         if (!signal?.aborted && currentRequestIdRef.current === requestId) {
+           setState((prev) => ({
+             ...prev,
+-            error: error instanceof Error ? error.message : "An error occurred",
++            error: error instanceof Error ? error.message : "发生错误",
+             isLoading: false,
+           }));
+         }
+@@ -545,7 +545,7 @@ export const useCompletion = () => {
+       if (state.attachedFiles.length >= MAX_FILES) {
+         setState((prev) => ({
+           ...prev,
+-          error: `You can only upload ${MAX_FILES} files`,
++          error: `最多只能上传 ${MAX_FILES} 个文件`,
+         }));
+         return;
+       }
+@@ -662,7 +662,7 @@ export const useCompletion = () => {
+             if (currentRequestIdRef.current === requestId && !signal.aborted) {
+               setState((prev) => ({
+                 ...prev,
+-                error: e.message || "An error occurred",
++                error: e.message || "发生错误",
+               }));
+             }
+           } finally {
+@@ -693,7 +693,7 @@ export const useCompletion = () => {
+           error:
+             error instanceof Error
+               ? error.message
+-              : "An error occurred processing screenshot",
++              : "处理截图时发生错误",
+           isLoading: false,
+         }));
+       }
+diff --git a/src/hooks/useCustomProvider.ts b/src/hooks/useCustomProvider.ts
+index 3bf73f0..931ee5d 100644
+--- a/src/hooks/useCustomProvider.ts
++++ b/src/hooks/useCustomProvider.ts
+@@ -77,7 +77,7 @@ export function useCustomAiProviders() {
+     const newErrors: { [key: string]: string } = {};
+ 
+     if (!formData.curl.trim()) {
+-      newErrors.curl = "Curl command is required";
++      newErrors.curl = "Curl 命令不能为空";
+     } else {
+       const validation = validateCurl(formData.curl, ["TEXT"]);
+       if (!validation.isValid) {
+@@ -86,7 +86,7 @@ export function useCustomAiProviders() {
+     }
+ 
+     if (!formData.responseContentPath?.trim()) {
+-      newErrors.responseContentPath = "Response content path is required";
++      newErrors.responseContentPath = "响应内容路径不能为空";
+     }
+ 
+     setErrors(newErrors);
+diff --git a/src/hooks/useMenuItems.tsx b/src/hooks/useMenuItems.tsx
+index 32886fb..602d7ad 100644
+--- a/src/hooks/useMenuItems.tsx
++++ b/src/hooks/useMenuItems.tsx
+@@ -8,19 +8,15 @@ import {
+   MonitorIcon,
+   HomeIcon,
+   PowerIcon,
+-  MailIcon,
+   CoffeeIcon,
+   GlobeIcon,
+   BugIcon,
+   MessageSquareTextIcon,
+ } from "lucide-react";
+ import { invoke } from "@tauri-apps/api/core";
+-import { useApp } from "@/contexts";
+ import { XIcon, GithubIcon } from "@/components";
+ 
+ export const useMenuItems = () => {
+-  const { hasActiveLicense } = useApp();
+-
+   const menu: {
+     icon: React.ElementType;
+     label: string;
+@@ -75,15 +71,6 @@ export const useMenuItems = () => {
+   ];
+ 
+   const footerItems = [
+-    ...(hasActiveLicense
+-      ? [
+-          {
+-            icon: MailIcon,
+-            label: "联系支持",
+-            href: "mailto:support@pluely.com",
+-          },
+-        ]
+-      : []),
+     {
+       icon: BugIcon,
+       label: "反馈问题",
+diff --git a/src/lib/functions/ai-response.function.ts b/src/lib/functions/ai-response.function.ts
+index 23ddbe2..1d33351 100644
+--- a/src/lib/functions/ai-response.function.ts
++++ b/src/lib/functions/ai-response.function.ts
+@@ -7,11 +7,7 @@ import {
+ } from "./common.function";
+ import { Message, TYPE_PROVIDER } from "@/types";
+ import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
+-import { invoke } from "@tauri-apps/api/core";
+-import { listen } from "@tauri-apps/api/event";
+ import curl2Json from "@bany/curl-to-json";
+-import { shouldUsePluelyAPI } from "./pluely.api";
+-import { CHUNK_POLL_INTERVAL_MS } from "../chat-constants";
+ import { getResponseSettings, RESPONSE_LENGTHS, LANGUAGES } from "@/lib";
+ import { MARKDOWN_FORMATTING_INSTRUCTIONS } from "@/config/constants";
+ 
+@@ -43,124 +39,6 @@ function buildEnhancedSystemPrompt(baseSystemPrompt?: string): string {
+   return prompts.join(" ");
+ }
+ 
+-// Pluely AI streaming function
+-async function* fetchPluelyAIResponse(params: {
+-  systemPrompt?: string;
+-  userMessage: string;
+-  imagesBase64?: string[];
+-  history?: Message[];
+-  signal?: AbortSignal;
+-}): AsyncIterable<string> {
+-  try {
+-    const {
+-      systemPrompt,
+-      userMessage,
+-      imagesBase64 = [],
+-      history = [],
+-      signal,
+-    } = params;
+-
+-    // Check if already aborted before starting
+-    if (signal?.aborted) {
+-      return;
+-    }
+-
+-    // Convert history to the expected format
+-    let historyString: string | undefined;
+-    if (history.length > 0) {
+-      // Create a copy before reversing to avoid mutating the original array
+-      const formattedHistory = [...history].reverse().map((msg) => ({
+-        role: msg.role,
+-        content: [{ type: "text", text: msg.content }],
+-      }));
+-      historyString = JSON.stringify(formattedHistory);
+-    }
+-
+-    // Handle images - can be string or array
+-    let imageBase64: any = undefined;
+-    if (imagesBase64.length > 0) {
+-      imageBase64 = imagesBase64.length === 1 ? imagesBase64[0] : imagesBase64;
+-    }
+-
+-    // Set up streaming event listener
+-    let streamComplete = false;
+-    const streamChunks: string[] = [];
+-
+-    const unlisten = await listen("chat_stream_chunk", (event) => {
+-      const chunk = event.payload as string;
+-      streamChunks.push(chunk);
+-    });
+-
+-    const unlistenComplete = await listen("chat_stream_complete", () => {
+-      streamComplete = true;
+-    });
+-
+-    try {
+-      // Check if aborted before starting invoke
+-      if (signal?.aborted) {
+-        unlisten();
+-        unlistenComplete();
+-        return;
+-      }
+-
+-      // Start the streaming request using the new API response endpoint
+-      await invoke("chat_stream_response", {
+-        userMessage,
+-        systemPrompt,
+-        imageBase64,
+-        history: historyString,
+-      });
+-
+-      // Yield chunks as they come in
+-      let lastIndex = 0;
+-      while (!streamComplete) {
+-        // Check if aborted during streaming
+-        if (signal?.aborted) {
+-          unlisten();
+-          unlistenComplete();
+-          return;
+-        }
+-
+-        // Wait a bit for chunks to accumulate
+-        await new Promise((resolve) =>
+-          setTimeout(resolve, CHUNK_POLL_INTERVAL_MS)
+-        );
+-
+-        // Check again after timeout
+-        if (signal?.aborted) {
+-          unlisten();
+-          unlistenComplete();
+-          return;
+-        }
+-
+-        // Yield any new chunks
+-        for (let i = lastIndex; i < streamChunks.length; i++) {
+-          yield streamChunks[i];
+-        }
+-        lastIndex = streamChunks.length;
+-      }
+-
+-      // Final abort check before yielding remaining chunks
+-      if (signal?.aborted) {
+-        unlisten();
+-        unlistenComplete();
+-        return;
+-      }
+-
+-      // Yield any remaining chunks
+-      for (let i = lastIndex; i < streamChunks.length; i++) {
+-        yield streamChunks[i];
+-      }
+-    } finally {
+-      unlisten();
+-      unlistenComplete();
+-    }
+-  } catch (error) {
+-    const errorMessage = error instanceof Error ? error.message : String(error);
+-    yield `Pluely API Error: ${errorMessage}`;
+-  }
+-}
+-
+ export async function* fetchAIResponse(params: {
+   provider: TYPE_PROVIDER | undefined;
+   selectedProvider: {
+@@ -191,23 +69,11 @@ export async function* fetchAIResponse(params: {
+ 
+     const enhancedSystemPrompt = buildEnhancedSystemPrompt(systemPrompt);
+ 
+-    // Check if we should use Pluely API instead
+-    const usePluelyAPI = await shouldUsePluelyAPI();
+-    if (usePluelyAPI) {
+-      yield* fetchPluelyAIResponse({
+-        systemPrompt: enhancedSystemPrompt,
+-        userMessage,
+-        imagesBase64,
+-        history,
+-        signal,
+-      });
+-      return;
+-    }
+     if (!provider) {
+-      throw new Error(`Provider not provided`);
++      throw new Error(`未提供服务商配置`);
+     }
+     if (!selectedProvider) {
+-      throw new Error(`Selected provider not provided`);
++      throw new Error(`未选择服务商`);
+     }
+ 
+     let curlJson;
+@@ -215,8 +81,8 @@ export async function* fetchAIResponse(params: {
+       curlJson = curl2Json(provider.curl);
+     } catch (error) {
+       throw new Error(
+-        `Failed to parse curl: ${
+-          error instanceof Error ? error.message : "Unknown error"
++        `Curl 解析失败: ${
++          error instanceof Error ? error.message : "未知错误"
+         }`
+       );
+     }
+@@ -231,17 +97,17 @@ export async function* fetchAIResponse(params: {
+         selectedProvider.variables[key].trim() === ""
+       ) {
+         throw new Error(
+-          `Missing required variable: ${key}. Please configure it in settings.`
++          `缺少必要变量: ${key}，请在设置中配置。`
+         );
+       }
+     }
+ 
+     if (!userMessage) {
+-      throw new Error("User message is required");
++      throw new Error("用户消息不能为空");
+     }
+     if (imagesBase64.length > 0 && !provider.curl.includes("{{IMAGE}}")) {
+       throw new Error(
+-        `Provider ${provider?.id ?? "unknown"} does not support image input`
++        `服务商 ${provider?.id ?? "未知"} 不支持图片输入`
+       );
+     }
+ 
+@@ -309,8 +175,8 @@ export async function* fetchAIResponse(params: {
+       ) {
+         return; // Silently return on abort
+       }
+-      yield `Network error during API request: ${
+-        fetchError instanceof Error ? fetchError.message : "Unknown error"
++      yield `API 请求网络错误: ${
++        fetchError instanceof Error ? fetchError.message : "未知错误"
+       }`;
+       return;
+     }
+@@ -320,7 +186,7 @@ export async function* fetchAIResponse(params: {
+       try {
+         errorText = await response.text();
+       } catch {}
+-      yield `API request failed: ${response.status} ${response.statusText}${
++      yield `API 请求失败: ${response.status} ${response.statusText}${
+         errorText ? ` - ${errorText}` : ""
+       }`;
+       return;
+@@ -331,8 +197,8 @@ export async function* fetchAIResponse(params: {
+       try {
+         json = await response.json();
+       } catch (parseError) {
+-        yield `Failed to parse non-streaming response: ${
+-          parseError instanceof Error ? parseError.message : "Unknown error"
++        yield `解析非流式响应失败: ${
++          parseError instanceof Error ? parseError.message : "未知错误"
+         }`;
+         return;
+       }
+@@ -369,8 +235,8 @@ export async function* fetchAIResponse(params: {
+         ) {
+           return; // Silently return on abort
+         }
+-        yield `Error reading stream: ${
+-          readError instanceof Error ? readError.message : "Unknown error"
++        yield `读取流错误: ${
++          readError instanceof Error ? readError.message : "未知错误"
+         }`;
+         return;
+       }
+@@ -408,8 +274,8 @@ export async function* fetchAIResponse(params: {
+     }
+   } catch (error) {
+     throw new Error(
+-      `Error in fetchAIResponse: ${
+-        error instanceof Error ? error.message : "Unknown error"
++      `fetchAIResponse 错误: ${
++        error instanceof Error ? error.message : "未知错误"
+       }`
+     );
+   }
+diff --git a/src/lib/functions/pluely.api.ts b/src/lib/functions/pluely.api.ts
+index f6a0d71..6e161cf 100644
+--- a/src/lib/functions/pluely.api.ts
++++ b/src/lib/functions/pluely.api.ts
+@@ -1,20 +1,4 @@
+-import { invoke } from "@tauri-apps/api/core";
+-import { safeLocalStorage } from "../storage";
+-import { STORAGE_KEYS } from "@/config";
+-
+-// Helper function to check if Pluely API should be used
++// Pluely API 已禁用，中国化版本直接使用自定义 Provider 直连模式
+ export async function shouldUsePluelyAPI(): Promise<boolean> {
+-  try {
+-    // Check if Pluely API is enabled in localStorage
+-    const pluelyApiEnabled =
+-      safeLocalStorage.getItem(STORAGE_KEYS.PLUELY_API_ENABLED) === "true";
+-    if (!pluelyApiEnabled) return false;
+-
+-    // Check if license is available
+-    const hasLicense = await invoke<boolean>("check_license_status");
+-    return hasLicense;
+-  } catch (error) {
+-    console.warn("Failed to check Pluely API availability:", error);
+-    return false;
+-  }
++  return false;
+ }
+diff --git a/src/pages/dashboard/index.tsx b/src/pages/dashboard/index.tsx
+index 5b60ec2..106c0a7 100644
+--- a/src/pages/dashboard/index.tsx
++++ b/src/pages/dashboard/index.tsx
+@@ -1,6 +1,6 @@
+ import { useCallback, useEffect, useState } from "react";
+ import { invoke } from "@tauri-apps/api/core";
+-import { PluelyApiSetup, Usage } from "./components";
++import { Usage } from "./components";
+ import { PageLayout } from "@/layouts";
+ 
+ const Dashboard = () => {
+@@ -40,9 +40,6 @@ const Dashboard = () => {
+       title="控制台"
+       description="管理你的 AI 服务商、模型和设置。"
+     >
+-      {/* Pluely API Setup */}
+-      <PluelyApiSetup />
+-
+       <Usage
+         loading={loadingActivity}
+         onRefresh={fetchActivity}
+diff --git a/src/pages/dev/index.tsx b/src/pages/dev/index.tsx
+index afff41e..9394a52 100644
+--- a/src/pages/dev/index.tsx
++++ b/src/pages/dev/index.tsx
+@@ -1,5 +1,4 @@
+ import { AIProviders, STTProviders } from "./components";
+-import Contribute from "@/components/Contribute";
+ import { useSettings } from "@/hooks";
+ import { PageLayout } from "@/layouts";
+ 
+@@ -8,7 +7,6 @@ const DevSpace = () => {
+ 
+   return (
+     <PageLayout title="开发空间" description="管理开发空间">
+-      <Contribute />
+       {/* Provider Selection */}
+       <AIProviders {...settings} />
+ 
+diff --git a/src/pages/responses/components/AutoScrollToggle.tsx b/src/pages/responses/components/AutoScrollToggle.tsx
+index 93130c7..b14d7a0 100644
+--- a/src/pages/responses/components/AutoScrollToggle.tsx
++++ b/src/pages/responses/components/AutoScrollToggle.tsx
+@@ -1,10 +1,8 @@
+ import { Switch, Label, Header } from "@/components";
+-import { useApp } from "@/contexts";
+ import { useState, useEffect } from "react";
+ import { getResponseSettings, updateAutoScroll } from "@/lib";
+ 
+ export const AutoScrollToggle = () => {
+-  const { hasActiveLicense } = useApp();
+   const [autoScroll, setAutoScroll] = useState<boolean>(true);
+ 
+   useEffect(() => {
+@@ -13,9 +11,6 @@ export const AutoScrollToggle = () => {
+   }, []);
+ 
+   const handleSwitchChange = (checked: boolean) => {
+-    if (!hasActiveLicense) {
+-      return;
+-    }
+     setAutoScroll(checked);
+     updateAutoScroll(checked);
+   };
+@@ -44,7 +39,6 @@ export const AutoScrollToggle = () => {
+         <Switch
+           checked={autoScroll}
+           onCheckedChange={handleSwitchChange}
+-          disabled={!hasActiveLicense}
+           title={`切换${!autoScroll ? "启用" : "禁用"}自动滚动`}
+           aria-label={`切换${autoScroll ? "禁用" : "启用"}自动滚动`}
+         />
+diff --git a/src/pages/responses/components/LanguageSelector.tsx b/src/pages/responses/components/LanguageSelector.tsx
+index ba217ed..236962a 100644
+--- a/src/pages/responses/components/LanguageSelector.tsx
++++ b/src/pages/responses/components/LanguageSelector.tsx
+@@ -1,12 +1,10 @@
+ import { Header, Selection } from "@/components";
+ import { LANGUAGES } from "@/lib";
+-import { useApp } from "@/contexts";
+ import { updateLanguage } from "@/lib/storage/response-settings.storage";
+ import { useState, useEffect, useMemo } from "react";
+ import { getResponseSettings } from "@/lib";
+ 
+ export const LanguageSelector = () => {
+-  const { hasActiveLicense } = useApp();
+   const [selectedLanguage, setSelectedLanguage] = useState<string>("english");
+ 
+   useEffect(() => {
+@@ -15,9 +13,6 @@ export const LanguageSelector = () => {
+   }, []);
+ 
+   const handleLanguageChange = (languageId: string) => {
+-    if (!hasActiveLicense) {
+-      return;
+-    }
+     setSelectedLanguage(languageId);
+     updateLanguage(languageId);
+   };
+@@ -43,7 +38,6 @@ export const LanguageSelector = () => {
+           onChange={handleLanguageChange}
+           options={languageOptions}
+           placeholder="选择语言"
+-          disabled={!hasActiveLicense}
+         />
+       </div>
+     </div>
+diff --git a/src/pages/responses/components/ResponseLength.tsx b/src/pages/responses/components/ResponseLength.tsx
+index 04643e0..0e9f6e1 100644
+--- a/src/pages/responses/components/ResponseLength.tsx
++++ b/src/pages/responses/components/ResponseLength.tsx
+@@ -1,13 +1,11 @@
+ import { Card, Header } from "@/components";
+ import { RESPONSE_LENGTHS } from "@/lib";
+-import { useApp } from "@/contexts";
+ import { updateResponseLength } from "@/lib/storage/response-settings.storage";
+ import { useState, useEffect } from "react";
+ import { getResponseSettings } from "@/lib";
+ import { CheckCircle2 } from "lucide-react";
+ 
+ export const ResponseLength = () => {
+-  const { hasActiveLicense } = useApp();
+   const [selectedLength, setSelectedLength] = useState<string>("auto");
+ 
+   useEffect(() => {
+@@ -16,9 +14,6 @@ export const ResponseLength = () => {
+   }, []);
+ 
+   const handleLengthChange = (lengthId: string) => {
+-    if (!hasActiveLicense) {
+-      return;
+-    }
+     setSelectedLength(lengthId);
+     updateResponseLength(lengthId);
+   };
+@@ -39,7 +34,7 @@ export const ResponseLength = () => {
+               selectedLength === length.id
+                 ? "border-primary"
+                 : "border-border hover:border-primary/50"
+-            } ${!hasActiveLicense ? "opacity-50 cursor-not-allowed" : ""}`}
++            }`}
+             onClick={() => handleLengthChange(length.id)}
+           >
+             <div className="space-y-1">
+diff --git a/src/pages/responses/index.tsx b/src/pages/responses/index.tsx
+index 6fe8944..908a77e 100644
+--- a/src/pages/responses/index.tsx
++++ b/src/pages/responses/index.tsx
+@@ -4,27 +4,13 @@ import {
+   AutoScrollToggle,
+ } from "./components";
+ import { PageLayout } from "@/layouts";
+-import { useApp } from "@/contexts";
+ 
+ const Responses = () => {
+-  const { hasActiveLicense } = useApp();
+-
+   return (
+     <PageLayout
+       title="响应设置"
+       description="自定义 AI 生成和显示响应的方式"
+     >
+-      {!hasActiveLicense && (
+-        <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
+-          <p className="text-[10px] lg:text-sm text-foreground font-medium mb-2">
+-            🔒 高级功能
+-          </p>
+-          <p className="text-[10px] lg:text-sm text-muted-foreground">
+-            响应自定义功能（响应长度、语言选择和自动滚动控制）需要有效的许可证才能使用。
+-          </p>
+-        </div>
+-      )}
+-
+       {/* Response Length */}
+       <ResponseLength />
+ 
+diff --git a/src/pages/screenshot/components/ScreenshotConfigs.tsx b/src/pages/screenshot/components/ScreenshotConfigs.tsx
+index d2a3a7b..704c94f 100644
+--- a/src/pages/screenshot/components/ScreenshotConfigs.tsx
++++ b/src/pages/screenshot/components/ScreenshotConfigs.tsx
+@@ -15,7 +15,6 @@ export const ScreenshotConfigs = ({
+   handleScreenshotModeChange,
+   handleScreenshotPromptChange,
+   handleScreenshotEnabledChange,
+-  hasActiveLicense,
+ }: UseSettingsReturn) => {
+   return (
+     <div id="screenshot" className="space-y-3">
+@@ -53,15 +52,10 @@ export const ScreenshotConfigs = ({
+               </div>
+             </SelectTrigger>
+             <SelectContent>
+-              <SelectItem value="selection" disabled={!hasActiveLicense}>
++              <SelectItem value="selection">
+                 <div className="flex items-center gap-2">
+                   <MousePointer2Icon className="size-4" />
+                   <div className="font-medium">选区模式</div>
+-                  {!hasActiveLicense && (
+-                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+-                      需要有效许可证才能使用选区模式。
+-                    </span>
+-                  )}
+                 </div>
+               </SelectItem>
+               <SelectItem value="screenshot" className="flex flex-row gap-2">
+diff --git a/src/pages/settings/components/Theme.tsx b/src/pages/settings/components/Theme.tsx
+index 1e876be..61f15c6 100644
+--- a/src/pages/settings/components/Theme.tsx
++++ b/src/pages/settings/components/Theme.tsx
+@@ -1,4 +1,4 @@
+-import { useApp, useTheme } from "@/contexts";
++import { useTheme } from "@/contexts";
+ import { Header, Label, Slider, Button } from "@/components";
+ import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
+ import {
+@@ -10,24 +10,17 @@ import {
+ 
+ export const Theme = () => {
+   const { theme, transparency, setTheme, onSetTransparency } = useTheme();
+-  const { hasActiveLicense } = useApp();
+ 
+   return (
+     <div id="theme" className="relative space-y-3">
+       <Header
+-        title={`主题自定义${
+-          hasActiveLicense ? "" : "（需要有效许可证才能使用此功能）"
+-        }`}
++        title="主题自定义"
+         description="通过自定义主题和透明度设置个性化你的体验"
+         isMainTitle
+       />
+ 
+       {/* Theme Toggle */}
+-      <div
+-        className={`space-y-2 ${
+-          hasActiveLicense ? "" : "opacity-60 pointer-events-none"
+-        }`}
+-      >
++      <div className="space-y-2">
+         <div className="flex items-center justify-between">
+           <div className="flex items-center space-x-3">
+             <div>
+@@ -85,11 +78,7 @@ export const Theme = () => {
+       </div>
+ 
+       {/* Transparency Slider */}
+-      <div
+-        className={`space-y-2 ${
+-          hasActiveLicense ? "" : "opacity-60 pointer-events-none"
+-        }`}
+-      >
++      <div className="space-y-2">
+         <Header
+           title="窗口透明度"
+           description="调整应用窗口的透明度"
+@@ -107,7 +96,7 @@ export const Theme = () => {
+           </div>
+ 
+           <p className="text-xs text-muted-foreground/70">
+-            💡 提示：提高透明度可透视窗口，适合深色悬浮窗。修改立即生效。
++            提示：提高透明度可透视窗口，适合深色悬浮窗。修改立即生效。
+           </p>
+         </div>
+       </div>

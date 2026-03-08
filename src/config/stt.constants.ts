@@ -102,4 +102,14 @@ export const SPEECH_TO_TEXT_PROVIDERS = [
     responseContentPath: "results[0].alternatives[0].transcript",
     streaming: false,
   },
+  {
+    id: "siliconflow-whisper",
+    name: "硅基流动 Whisper",
+    curl: `curl -X POST "https://api.siliconflow.cn/v1/audio/transcriptions" \\
+      -H "Authorization: Bearer {{API_KEY}}" \\
+      -F "file={{AUDIO}}" \\
+      -F "model={{MODEL}}"`,
+    responseContentPath: "text",
+    streaming: false,
+  },
 ];

@@ -15,7 +15,6 @@ export const ScreenshotConfigs = ({
   handleScreenshotModeChange,
   handleScreenshotPromptChange,
   handleScreenshotEnabledChange,
-  hasActiveLicense,
 }: UseSettingsReturn) => {
   return (
     <div id="screenshot" className="space-y-3">
@@ -53,15 +52,10 @@ export const ScreenshotConfigs = ({
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="selection" disabled={!hasActiveLicense}>
+              <SelectItem value="selection">
                 <div className="flex items-center gap-2">
                   <MousePointer2Icon className="size-4" />
                   <div className="font-medium">选区模式</div>
-                  {!hasActiveLicense && (
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
-                      需要有效许可证才能使用选区模式。
-                    </span>
-                  )}
                 </div>
               </SelectItem>
               <SelectItem value="screenshot" className="flex flex-row gap-2">

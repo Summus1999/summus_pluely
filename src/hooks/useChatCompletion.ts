@@ -6,7 +6,6 @@ import {
   saveConversation,
   getConversationById,
   generateConversationTitle,
-  shouldUsePluelyAPI,
   MESSAGE_ID_OFFSET,
   generateMessageId,
   generateRequestId,
@@ -60,7 +59,6 @@ export const useChatCompletion = (
     selectedSttProvider,
     allSttProviders,
     selectedAudioDevices,
-    hasActiveLicense,
   } = useApp();
 
   const [state, setState] = useState<ChatCompletionState>({
@@ -174,9 +172,8 @@ export const useChatCompletion = (
           });
         }
 
-        const usePluelyAPI = await shouldUsePluelyAPI();
         // Check if AI provider is configured
-        if (!selectedAIProvider.provider && !usePluelyAPI) {
+        if (!selectedAIProvider.provider) {
           setState((prev) => ({
             ...prev,
             error: "请在设置中选择一个 AI 服务商",
@@ -187,7 +184,7 @@ export const useChatCompletion = (
         const provider = allAiProviders.find(
           (p) => p.id === selectedAIProvider.provider
         );
-        if (!provider && !usePluelyAPI) {
+        if (!provider) {
           setState((prev) => ({
             ...prev,
             error: "所选服务商无效",
@@ -227,7 +224,7 @@ export const useChatCompletion = (
         try {
           // Use the fetchAIResponse function with signal
           for await (const chunk of fetchAIResponse({
-            provider: usePluelyAPI ? undefined : provider,
+            provider,
             selectedProvider: selectedAIProvider,
             systemPrompt: systemPrompt || undefined,
             history: messageHistory,
@@ -286,7 +283,7 @@ export const useChatCompletion = (
             setState((prev) => ({
               ...prev,
               isLoading: false,
-              error: e.message || "An error occurred",
+              error: e.message || "发生错误",
             }));
           }
           return;
@@ -368,7 +365,7 @@ export const useChatCompletion = (
         if (!signal?.aborted && currentRequestIdRef.current === requestId) {
           setState((prev) => ({
             ...prev,
-            error: error instanceof Error ? error.message : "An error occurred",
+            error: error instanceof Error ? error.message : "发生错误",
             isLoading: false,
           }));
         }
@@ -429,7 +426,7 @@ export const useChatCompletion = (
       if (state.attachedFiles.length >= MAX_FILES) {
         setState((prev) => ({
           ...prev,
-          error: `You can only upload ${MAX_FILES} files`,
+          error: `最多只能上传 ${MAX_FILES} 个文件`,
         }));
         return;
       }
@@ -476,7 +473,7 @@ export const useChatCompletion = (
           error:
             error instanceof Error
               ? error.message
-              : "An error occurred processing screenshot",
+              : "处理截图时发生错误",
           isLoading: false,
         }));
       }
@@ -606,7 +603,7 @@ export const useChatCompletion = (
         setIsScreenshotLoading(false);
       }
     }
-  }, [handleScreenshotSubmit, hasActiveLicense]);
+  }, [handleScreenshotSubmit]);
 
   useEffect(() => {
     let unlisten: any;
@@ -710,6 +707,5 @@ export const useChatCompletion = (
     selectedSttProvider,
     allSttProviders,
     selectedAudioDevices,
-    hasActiveLicense,
   };
 };

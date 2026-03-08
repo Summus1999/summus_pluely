@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { PluelyApiSetup, Usage } from "./components";
+import { Usage } from "./components";
 import { PageLayout } from "@/layouts";
 
 const Dashboard = () => {
@@ -40,9 +40,6 @@ const Dashboard = () => {
       title="控制台"
       description="管理你的 AI 服务商、模型和设置。"
     >
-      {/* Pluely API Setup */}
-      <PluelyApiSetup />
-
       <Usage
         loading={loadingActivity}
         onRefresh={fetchActivity}

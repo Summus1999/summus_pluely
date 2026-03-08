@@ -130,4 +130,76 @@ export const AI_PROVIDERS = [
     responseContentPath: "choices[0].message.content",
     streaming: true,
   },
+  {
+    id: "siliconflow",
+    curl: `curl -X POST https://api.siliconflow.cn/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -H "Authorization: Bearer {{API_KEY}}" \\
+    -d '{
+    "model": "{{MODEL}}",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "deepseek",
+    curl: `curl -X POST https://api.deepseek.com/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -H "Authorization: Bearer {{API_KEY}}" \\
+    -d '{
+    "model": "{{MODEL}}",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "zhipu",
+    curl: `curl -X POST https://open.bigmodel.cn/api/paas/v4/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -H "Authorization: Bearer {{API_KEY}}" \\
+    -d '{
+    "model": "{{MODEL}}",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "moonshot",
+    curl: `curl -X POST https://api.moonshot.cn/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -H "Authorization: Bearer {{API_KEY}}" \\
+    -d '{
+    "model": "{{MODEL}}",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "qwen",
+    curl: `curl -X POST https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -H "Authorization: Bearer {{API_KEY}}" \\
+    -d '{
+    "model": "{{MODEL}}",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
+  {
+    id: "baichuan",
+    curl: `curl -X POST https://api.baichuan-ai.com/v1/chat/completions \\
+    -H "Content-Type: application/json" \\
+    -H "Authorization: Bearer {{API_KEY}}" \\
+    -d '{
+    "model": "{{MODEL}}",
+    "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}]
+  }'`,
+    responseContentPath: "choices[0].message.content",
+    streaming: true,
+  },
 ];

@@ -49,7 +49,6 @@ export const PluelyPrompts = () => {
   const {
     setSystemPrompt,
     setSupportsImages,
-    pluelyApiEnabled,
   } = useApp();
   const [prompts, setPrompts] = useState<PluelyPrompt[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -161,11 +160,9 @@ export const PluelyPrompts = () => {
 
       if (matchingModel) {
         // Update supportsImages based on model modality
-        if (pluelyApiEnabled) {
-          const hasImageSupport =
-            matchingModel.modality?.includes("image") ?? false;
-          setSupportsImages(hasImageSupport);
-        }
+        const hasImageSupport =
+          matchingModel.modality?.includes("image") ?? false;
+        setSupportsImages(hasImageSupport);
 
         await invoke("secure_storage_save", {
           items: [

@@ -1,4 +1,4 @@
-import { useApp, useTheme } from "@/contexts";
+import { useTheme } from "@/contexts";
 import { Header, Label, Slider, Button } from "@/components";
 import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 import {
@@ -10,24 +10,17 @@ import {
 
 export const Theme = () => {
   const { theme, transparency, setTheme, onSetTransparency } = useTheme();
-  const { hasActiveLicense } = useApp();
 
   return (
     <div id="theme" className="relative space-y-3">
       <Header
-        title={`主题自定义${
-          hasActiveLicense ? "" : "（需要有效许可证才能使用此功能）"
-        }`}
+        title="主题自定义"
         description="通过自定义主题和透明度设置个性化你的体验"
         isMainTitle
       />
 
       {/* Theme Toggle */}
-      <div
-        className={`space-y-2 ${
-          hasActiveLicense ? "" : "opacity-60 pointer-events-none"
-        }`}
-      >
+      <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div>
@@ -85,11 +78,7 @@ export const Theme = () => {
       </div>
 
       {/* Transparency Slider */}
-      <div
-        className={`space-y-2 ${
-          hasActiveLicense ? "" : "opacity-60 pointer-events-none"
-        }`}
-      >
+      <div className="space-y-2">
         <Header
           title="窗口透明度"
           description="调整应用窗口的透明度"
@@ -107,7 +96,7 @@ export const Theme = () => {
           </div>
 
           <p className="text-xs text-muted-foreground/70">
-            💡 提示：提高透明度可透视窗口，适合深色悬浮窗。修改立即生效。
+            提示：提高透明度可透视窗口，适合深色悬浮窗。修改立即生效。
           </p>
         </div>
       </div>
