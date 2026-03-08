@@ -1,4 +1,5 @@
 import {
+  ApiConfig,
   Theme,
   AlwaysOnTopToggle,
   AppIconToggle,
@@ -9,6 +10,9 @@ import { PageLayout } from "@/layouts";
 const Settings = () => {
   return (
     <PageLayout title="设置" description="管理你的设置">
+      {/* API Config */}
+      <ApiConfig />
+
       {/* Theme */}
       <Theme />
 
