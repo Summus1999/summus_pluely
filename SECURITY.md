@@ -1,11 +1,11 @@
-# Security Policy
+# 安全策略
 
-If you believe you have found a security vulnerability, we encourage you to let us know right away.
+如果你发现了安全漏洞，请立即告知我们。
 
-We will investigate all legitimate reports and do our best to quickly fix the problem.
+我们会调查所有合理的报告，并尽最大努力快速修复问题。
 
-Our preference is that you make use of GitHub's private vulnerability reporting feature to disclose potential security vulnerabilities in our Open Source Software.
+我们希望你通过 GitHub 的私密漏洞报告功能来披露我们开源软件中潜在的安全漏洞。
 
-To do this, please visit the [Security tab](https://github.com/iamsrikanthnani/pluely/security) of the repository and click the **"Report a vulnerability"** button.
+具体操作请访问仓库的 [Security 标签页](https://github.com/iamsrikanthnani/pluely/security)，点击 **"Report a vulnerability"** 按钮。
 
-For urgent matters, you can also contact us at [support@pluely.com](mailto:support@pluely.com).
+如遇紧急事项，也可通过邮件联系我们：[support@pluely.com](mailto:support@pluely.com)。
