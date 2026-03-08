@@ -47,14 +47,14 @@ export const CreateEditProvider = ({
           className="w-full h-11 border-1 border-input/50 focus:border-primary/50 transition-colors"
         >
           <PlusIcon className="h-4 w-4 mr-2" />
-          Add Custom Provider
+          添加自定义 AI 服务商
         </Button>
       ) : (
         <Card className="p-4 border !bg-transparent border-input/50 ">
           <div className="flex justify-between items-center">
             <Header
-              title={editingProvider ? `Edit Provider` : "Add Custom Provider"}
-              description="Create a custom AI provider to use with your AI-powered applications."
+              title={editingProvider ? `编辑 AI 服务商` : "添加自定义 AI 服务商"}
+              description="创建自定义 AI 服务商以用于你的 AI 应用。"
             />
 
             <div className="w-[120px]">
@@ -67,7 +67,7 @@ export const CreateEditProvider = ({
                       value: provider?.id || "AI Provider",
                     };
                   })}
-                placeholder={"Auto-fill"}
+                placeholder={"自动填充"}
                 onChange={(value) => {
                   handleAutoFill(value);
                 }}
@@ -79,8 +79,8 @@ export const CreateEditProvider = ({
             {/* Basic Configuration */}
             <div className="space-y-1">
               <Header
-                title="Curl Command *"
-                description="The curl command to use with the AI provider."
+                title="Curl 命令 *"
+                description="用于 AI 服务商的 curl 命令。"
               />
               <Textarea
                 className={cn(
@@ -127,22 +127,19 @@ export const CreateEditProvider = ({
               <div className="bg-muted/50 p-4 rounded-lg space-y-4">
                 <div className="bg-card border p-3 rounded-lg">
                   <p className="text-sm font-medium text-primary mb-2">
-                    💡 Important: You can add custom variables or directly
-                    include your API keys/values
+                    💡 重要提示：你可以添加自定义变量，也可以直接填入你的 API 密钥/值
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    No need to enter variables separately when selecting the
-                    provider - you can embed them directly in the curl command
-                    (e.g., replace YOUR_API_KEY with your actual key or use{" "}
+                    选择服务商时无需单独输入变量——你可以直接在 curl 命令中嵌入（例如，将 YOUR_API_KEY 替换为你的实际密钥，或使用{" "}
                     <code className="bg-muted px-1 rounded text-xs">
                       {"{{MODEL}}"}
                     </code>{" "}
-                    for model name).
+                    作为模型名称）。
                   </p>
                 </div>
 
                 <h4 className="text-sm font-semibold text-foreground">
-                  ⚠️ Required Variables for AI Providers:
+                  ⚠️ AI 服务商必需变量：
                 </h4>
                 <div className="grid grid-cols-1 gap-3 text-sm">
                   <div className="flex items-center gap-3 p-3 bg-card border rounded-lg">
@@ -150,7 +147,7 @@ export const CreateEditProvider = ({
                       {"{{TEXT}}"}
                     </code>
                     <span className="text-foreground font-medium">
-                      → REQUIRED: User's text input
+                      → 必需：用户的文本输入
                     </span>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-card border rounded-lg">
@@ -158,8 +155,7 @@ export const CreateEditProvider = ({
                       {"{{IMAGE}}"}
                     </code>
                     <span className="text-muted-foreground">
-                      → Base64 image data (without data:image/jpeg;base64
-                      prefix)
+                      → Base64 图片数据（不含 data:image/jpeg;base64 前缀）
                     </span>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-card border rounded-lg">
@@ -167,45 +163,44 @@ export const CreateEditProvider = ({
                       {"{{SYSTEM_PROMPT}}"}
                     </code>
                     <span className="text-muted-foreground">
-                      → System prompt/instructions(optional)
+                      → 系统提示词/指令（可选）
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    <strong className="text-foreground">Quick Setup:</strong>{" "}
-                    Replace{" "}
+                    <strong className="text-foreground">快速设置：</strong>{" "}
+                    在 curl 命令中将{" "}
                     <code className="bg-muted px-1 rounded text-xs">
                       YOUR_API_KEY
                     </code>{" "}
-                    with your actual API key directly in the curl command.
+                    直接替换为你的实际 API 密钥。
                   </p>
                   <p className="text-sm text-muted-foreground">
                     <strong className="text-foreground">
-                      Custom Variables:
+                      自定义变量：
                     </strong>{" "}
-                    You can add your own variables using the same{" "}
+                    你可以使用相同的{" "}
                     <code className="bg-muted px-1 rounded text-xs">
                       {"{{VARIABLE_NAME}}"}
                     </code>{" "}
-                    format and they'll be available for configuration when you
-                    select this provider.
+                    格式添加自己的变量，选择该服务商时即可进行配置。
                   </p>
                   <p className="text-xs text-muted-foreground italic">
-                    💡 Tip: Use the required variables (
+                    💡 提示：使用必需变量（
                     <code className="bg-muted px-1 rounded text-xs">
                       {"{{TEXT}}"}
                     </code>
-                    ,{" "}
+                    、{" "}
                     <code className="bg-muted px-1 rounded text-xs">
                       {"{{SYSTEM_PROMPT}}"}
                     </code>
-                    ) for basic functionality. Add{" "}
+                    ）实现基本功能。仅在你的服务商支持图片输入时添加{" "}
                     <code className="bg-muted px-1 rounded text-xs">
                       {"{{IMAGE}}"}
-                    </code>{" "}
-                    only if your provider supports image input.
+                    </code>
+                    。
                   </p>
                 </div>
               </div>
@@ -215,7 +210,7 @@ export const CreateEditProvider = ({
           <div className="flex justify-between items-center space-x-2">
             <Header
               title="Streaming"
-              description="streaming is used to stream the response from the AI provider."
+              description="用于从 AI 服务商流式获取响应。"
             />
             <Switch
               checked={formData.streaming}
@@ -230,8 +225,8 @@ export const CreateEditProvider = ({
           {/* Response Configuration */}
           <div className="space-y-2">
             <Header
-              title="Response Content Path *"
-              description="The path to extract content from the API response."
+              title="响应内容路径 *"
+              description="从 API 响应中提取内容的路径。"
             />
 
             <TextInput
@@ -244,7 +239,7 @@ export const CreateEditProvider = ({
                 }))
               }
               error={errors.responseContentPath}
-              notes="The path to extract content from the API response. Examples: choices[0].message.content, text, candidates[0].content.parts[0].text"
+              notes="从 API 响应中提取内容的路径。示例：choices[0].message.content、text、candidates[0].content.parts[0].text"
             />
           </div>
 
@@ -254,7 +249,7 @@ export const CreateEditProvider = ({
               onClick={() => setShowForm(!showForm)}
               className="h-11 border-1 border-input/50 focus:border-primary/50 transition-colors"
             >
-              Cancel
+              取消
             </Button>
             <Button
               onClick={handleSave}
@@ -265,11 +260,11 @@ export const CreateEditProvider = ({
               )}
             >
               {errors.curl ? (
-                "Invalid cURL, try again"
+                "cURL 无效，请重试"
               ) : (
                 <>
                   <SaveIcon className="h-4 w-4 mr-2" />
-                  {editingProvider ? "Update" : "Save"} Provider
+                  {editingProvider ? "更新" : "保存"}服务商
                 </>
               )}
             </Button>

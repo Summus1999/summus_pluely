@@ -8,7 +8,7 @@ export const ErrorLayout = ({ isCompact }: { isCompact?: boolean }) => {
         <SparklesIcon className="size-5 text-background" />
       </div>
       <p className="text-sm md:text-xl">
-        Oops! Something went wrong. Click reload to restart the app.
+        出错了！请点击重新加载按钮重启应用。
       </p>
 
       <div className="flex flex-row items-center gap-2">
@@ -32,15 +32,14 @@ export const ErrorLayout = ({ isCompact }: { isCompact?: boolean }) => {
 
         <div className="flex flex-col gap-4 items-center text-center select-none mt-8">
           <h1 className="text-6xl md:text-6xl font-bold hover:scale-105 transition-transform duration-200">
-            Oops!
+            出错了！
           </h1>
           <div className="space-y-2">
             <p className="text-xl md:text-2xl font-medium text-foreground">
-              Something unexpected happened
+              发生了意外错误
             </p>
             <p className="text-sm md:text-base text-muted-foreground">
-              Don't worry! Just click the reload button below to restart the
-              app.
+              别担心！点击下方的重新加载按钮即可重启应用。
             </p>
           </div>
         </div>
@@ -51,7 +50,7 @@ export const ErrorLayout = ({ isCompact }: { isCompact?: boolean }) => {
             onClick={() => window.location.reload()}
             className="w-full shadow-sm hover:shadow-md transition-shadow duration-200"
           >
-            <RefreshCcwIcon className="size-4" /> Reload
+            <RefreshCcwIcon className="size-4" /> 重新加载
           </Button>
         </div>
       </div>

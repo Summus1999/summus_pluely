@@ -17,12 +17,10 @@ const Responses = () => {
       {!hasActiveLicense && (
         <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
           <p className="text-[10px] lg:text-sm text-foreground font-medium mb-2">
-            🔒 Premium Features
+            🔒 高级功能
           </p>
           <p className="text-[10px] lg:text-sm text-muted-foreground">
-            Response customization features (Response Length, Language
-            Selection, and Auto-Scroll Control) require an active license to
-            use.
+            响应自定义功能（响应长度、语言选择和自动滚动控制）需要有效的许可证才能使用。
           </p>
         </div>
       )}

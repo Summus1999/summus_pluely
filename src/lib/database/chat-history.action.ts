@@ -445,7 +445,7 @@ export async function migrateLocalStorageToSQLite(): Promise<{
       return {
         success: false,
         migratedCount: 0,
-        error: "Failed to parse localStorage data",
+        error: "解析本地存储数据失败",
       };
     }
 

@@ -165,11 +165,11 @@ export const SystemAudio = (props: useSystemAudioType) => {
   };
 
   const getButtonTitle = () => {
-    if (setupRequired) return "Setup required - Click for instructions";
-    if (error && !setupRequired) return `Error: ${error}`;
-    if (isProcessing) return "Transcribing audio...";
-    if (capturing) return "Stop system audio capture";
-    return "Start system audio capture";
+    if (setupRequired) return "需要配置 - 点击查看说明";
+    if (error && !setupRequired) return `错误：${error}`;
+    if (isProcessing) return "正在转录音频...";
+    if (capturing) return "停止系统音频采集";
+    return "开始系统音频采集";
   };
 
   return (
@@ -236,14 +236,14 @@ export const SystemAudio = (props: useSystemAudioType) => {
                         "h-6 text-[10px] gap-1 px-2",
                         screenshotImage && "bg-primary text-primary-foreground"
                       )}
-                      title="Capture screenshot to include with transcription"
+                      title="截取屏幕并附加到转录内容"
                     >
                       {isCapturingScreenshot ? (
                         <LoaderIcon className="w-3 h-3 animate-spin" />
                       ) : (
                         <CameraIcon className="w-3 h-3" />
                       )}
-                      Screenshot
+                      截图
                     </Button>
                   )}
 
@@ -254,10 +254,10 @@ export const SystemAudio = (props: useSystemAudioType) => {
                       variant="ghost"
                       onClick={startNewConversation}
                       className="h-6 text-[10px] gap-1 px-2"
-                      title="Start a new conversation"
+                      title="开始新对话"
                     >
                       <PlusIcon className="w-3 h-3" />
-                      New
+                      新建
                     </Button>
                   )}
 
@@ -267,7 +267,7 @@ export const SystemAudio = (props: useSystemAudioType) => {
                       size="icon"
                       variant="ghost"
                       className="h-6 w-6"
-                      title="Close"
+                      title="关闭"
                       onClick={() => {
                         setIsPopoverOpen(false);
                         resizeWindow(false);

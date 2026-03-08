@@ -153,17 +153,17 @@ export const AudioSelection = () => {
                     <MicIcon className="size-4" />
                     <div className="text-sm font-medium truncate">
                       {isLoadingDevices
-                        ? "Loading microphones..."
+                        ? "正在加载麦克风..."
                         : devices?.input?.length === 0
-                        ? "No microphones found"
+                        ? "未找到麦克风"
                         : devices?.input?.find(
                             (mic) => mic?.id === selectedAudioDevices.input.id
                           )?.name +
                             (devices?.input?.find(
                               (mic) => mic?.id === selectedAudioDevices.input.id
                             )?.is_default
-                              ? " (Default)"
-                              : "") || "Select a microphone"}
+                              ? "（默认）"
+                              : "") || "选择麦克风"}
                     </div>
                   </div>
                 </SelectTrigger>
@@ -173,7 +173,7 @@ export const AudioSelection = () => {
                       <div className="flex items-center gap-2">
                         <MicIcon className="size-4" />
                         <div className="font-medium truncate">{mic?.name} </div>
-                        {mic?.is_default && " (Default)"}
+                        {mic?.is_default && "（默认）"}
                       </div>
                     </SelectItem>
                   ))}
@@ -199,9 +199,9 @@ export const AudioSelection = () => {
           {/* Success message */}
           {showSuccess.input && (
             <div className="text-xs text-green-500 bg-green-500/10 p-3 rounded-md">
-              <strong>✓ Microphone changed successfully!</strong>
+              <strong>✓ 麦克风已成功切换！</strong>
               <br />
-              Using: {selectedAudioDevices.input.name || "Unknown device"}
+              当前使用：{selectedAudioDevices.input.name || "未知设备"}
             </div>
           )}
 
@@ -209,10 +209,9 @@ export const AudioSelection = () => {
           {devices?.input?.length === 0 && !isLoadingDevices && (
             <div className="text-xs text-amber-500 bg-amber-500/10 p-3 rounded-md">
               <strong>
-                ⚠️ Click the refresh button to load your microphone devices.
+                ⚠️ 点击刷新按钮加载麦克风设备。
               </strong>{" "}
-              If this doesn't work, try changing your default microphone in your
-              system settings.
+              如果仍然无效，请尝试在系统设置中更改默认麦克风。
             </div>
           )}
         </div>
@@ -220,10 +219,8 @@ export const AudioSelection = () => {
         {/* Tips */}
         <div className="text-xs text-muted-foreground/70">
           <p>
-            💡 <strong>Tip:</strong> When you select a microphone, the app will
-            immediately switch to that device. You can verify by hovering over
-            the microphone button in the main interface - it will show the
-            active device name.
+            💡 <strong>提示：</strong>选择麦克风后，应用将立即切换到该设备。
+            你可以将鼠标悬停在主界面的麦克风按钮上查看当前使用的设备名称。
           </p>
         </div>
       </div>
@@ -249,9 +246,9 @@ export const AudioSelection = () => {
                     <HeadphonesIcon className="size-4" />
                     <div className="text-sm font-medium truncate">
                       {isLoadingDevices
-                        ? "Loading output devices..."
+                        ? "正在加载输出设备..."
                         : devices?.output?.length === 0
-                        ? "No output devices found"
+                        ? "未找到输出设备"
                         : devices?.output?.find(
                             (output) =>
                               output?.id === selectedAudioDevices.output.id
@@ -260,8 +257,8 @@ export const AudioSelection = () => {
                               (output) =>
                                 output?.id === selectedAudioDevices.output.id
                             )?.is_default
-                              ? " (Default)"
-                              : "") || "Select an output device"}
+                              ? "（默认）"
+                              : "") || "选择输出设备"}
                     </div>
                   </div>
                 </SelectTrigger>
@@ -271,7 +268,7 @@ export const AudioSelection = () => {
                       <div className="flex items-center gap-2">
                         <HeadphonesIcon className="size-4" />
                         <div className="font-medium truncate">
-                          {output?.name} {output?.is_default && " (Default)"}
+                          {output?.name} {output?.is_default && "（默认）"}
                         </div>
                       </div>
                     </SelectItem>
@@ -298,9 +295,9 @@ export const AudioSelection = () => {
           {/* Success message */}
           {showSuccess.output && (
             <div className="text-xs text-green-500 bg-green-500/10 p-3 rounded-md">
-              <strong>✓ Output device changed successfully!</strong>
+              <strong>✓ 输出设备已成功切换！</strong>
               <br />
-              Using: {selectedAudioDevices.output.name || "Unknown device"}
+              当前使用：{selectedAudioDevices.output.name || "未知设备"}
             </div>
           )}
 
@@ -308,10 +305,9 @@ export const AudioSelection = () => {
           {devices?.output?.length === 0 && !isLoadingDevices && (
             <div className="text-xs text-amber-500 bg-amber-500/10 p-3 rounded-md">
               <strong>
-                ⚠️ Click the refresh button to load your system audio devices.
+                ⚠️ 点击刷新按钮加载系统音频设备。
               </strong>{" "}
-              If this doesn't work, try changing your default system audio
-              output in your system settings.
+              如果仍然无效，请尝试在系统设置中更改默认音频输出设备。
             </div>
           )}
         </div>
@@ -319,10 +315,8 @@ export const AudioSelection = () => {
         {/* Tips */}
         <div className="text-xs text-muted-foreground/70">
           <p>
-            💡 <strong>Tip:</strong> System audio capture allows you to record
-            audio playing through your speakers or headphones. This is useful
-            for capturing conversation audio or system sounds along with your
-            voice.
+            💡 <strong>提示：</strong>系统音频采集允许你录制通过扬声器或耳机播放的音频。
+            这对于同时采集对话音频或系统声音以及你的语音非常有用。
           </p>
         </div>
       </div>

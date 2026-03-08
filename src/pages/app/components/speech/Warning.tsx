@@ -28,7 +28,7 @@ export const Warning = ({ isVadMode }: WarningProps) => {
       >
         <div className="flex items-center gap-2">
           <InfoIcon className="w-3.5 h-3.5 text-muted-foreground" />
-          <span className="text-xs font-medium">Help & Keyboard Shortcuts</span>
+          <span className="text-xs font-medium">帮助与键盘快捷键</span>
         </div>
         <ChevronDownIcon
           className={cn(
@@ -49,12 +49,12 @@ export const Warning = ({ isVadMode }: WarningProps) => {
             )}
             <div>
               <p className="text-xs font-medium">
-                {isVadMode ? "Auto-detect Mode" : "Manual Mode"}
+                {isVadMode ? "自动检测模式" : "手动模式"}
               </p>
               <p className="text-[10px] text-muted-foreground mt-0.5">
                 {isVadMode
-                  ? "Speech is automatically detected from system audio. When someone speaks, it will be captured and transcribed."
-                  : "Press the record button or use keyboard shortcuts to manually control recording."}
+                  ? "自动从系统音频中检测语音。当有人说话时，将自动捕获并转录。"
+                  : "按下录音按钮或使用键盘快捷键手动控制录音。"}
               </p>
             </div>
           </div>
@@ -64,18 +64,18 @@ export const Warning = ({ isVadMode }: WarningProps) => {
             <div className="flex items-center gap-1.5">
               <KeyboardIcon className="w-3 h-3 text-muted-foreground" />
               <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
-                Keyboard Shortcuts
+                键盘快捷键
               </span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-[10px]">
               <div className="flex items-center justify-between p-1.5 rounded bg-muted/50">
-                <span className="text-muted-foreground">Scroll down</span>
+                <span className="text-muted-foreground">向下滚动</span>
                 <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono">
                   ↓
                 </kbd>
               </div>
               <div className="flex items-center justify-between p-1.5 rounded bg-muted/50">
-                <span className="text-muted-foreground">Scroll up</span>
+                <span className="text-muted-foreground">向上滚动</span>
                 <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono">
                   ↑
                 </kbd>
@@ -83,19 +83,19 @@ export const Warning = ({ isVadMode }: WarningProps) => {
               {!isVadMode && (
                 <>
                   <div className="flex items-center justify-between p-1.5 rounded bg-muted/50">
-                    <span className="text-muted-foreground">Start/Stop</span>
+                    <span className="text-muted-foreground">开始/停止</span>
                     <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono">
                       Enter
                     </kbd>
                   </div>
                   <div className="flex items-center justify-between p-1.5 rounded bg-muted/50">
-                    <span className="text-muted-foreground">Start record</span>
+                    <span className="text-muted-foreground">开始录音</span>
                     <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono">
                       Space
                     </kbd>
                   </div>
                   <div className="flex items-center justify-between p-1.5 rounded bg-muted/50">
-                    <span className="text-muted-foreground">Discard</span>
+                    <span className="text-muted-foreground">丢弃</span>
                     <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono">
                       Esc
                     </kbd>
@@ -103,7 +103,7 @@ export const Warning = ({ isVadMode }: WarningProps) => {
                 </>
               )}
               <div className="flex items-center justify-between p-1.5 rounded bg-muted/50">
-                <span className="text-muted-foreground">Toggle view</span>
+                <span className="text-muted-foreground">切换视图</span>
                 <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono">
                   {modKey}+K
                 </kbd>
@@ -116,22 +116,18 @@ export const Warning = ({ isVadMode }: WarningProps) => {
             <div className="flex items-center gap-1.5">
               <CameraIcon className="w-3 h-3 text-muted-foreground" />
               <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
-                Screenshot Feature
+                截图功能
               </span>
             </div>
             <div className="p-2 rounded-md bg-primary/5 text-[10px] text-muted-foreground space-y-1">
               <p>
-                Screenshot: Captures your current screen and attaches it to your
-                next transcription.
+                截图功能：捕获当前屏幕并附加到下一次转录中。
               </p>
               <p>
-                The AI will receive both the transcribed audio and the
-                screenshot image, allowing it to provide context-aware responses
-                based on what you're viewing.
+                AI 将同时接收转录的音频和截图图片，使其能够根据你正在查看的内容提供更有针对性的响应。
               </p>
               <p className="text-[9px] opacity-70">
-                The screenshot is automatically cleared after each message is
-                sent.
+                截图在每条消息发送后自动清除。
               </p>
             </div>
           </div>
@@ -139,20 +135,16 @@ export const Warning = ({ isVadMode }: WarningProps) => {
           {/* Tips */}
           <div className="text-[10px] text-muted-foreground space-y-1 pt-2 border-t border-border/50">
             <p>
-              <strong>Tip:</strong> Use Auto-detect for hands-free operation
-              during interviews.
+              <strong>提示：</strong>面试时使用自动检测模式可实现免提操作。
             </p>
             <p>
-              <strong>Tip:</strong> Use Manual mode when you need precise
-              control over what gets transcribed.
+              <strong>提示：</strong>需要精确控制转录内容时使用手动模式。
             </p>
             <p>
-              <strong>Tip:</strong> Quick Actions let you send follow-up prompts
-              with one click.
+              <strong>提示：</strong>快捷操作可让你一键发送后续提示。
             </p>
             <p>
-              <strong>Tip:</strong> Use Screenshot to share your screen context
-              with the AI for more relevant responses.
+              <strong>提示：</strong>使用截图功能与 AI 分享屏幕内容，获取更相关的响应。
             </p>
           </div>
         </div>

@@ -12,7 +12,7 @@ export const validateCurl = (
   if (!curl.trim().startsWith("curl")) {
     return {
       isValid: false,
-      message: "The command must start with 'curl'.",
+      message: "命令必须以 'curl' 开头。",
     };
   }
 
@@ -22,7 +22,7 @@ export const validateCurl = (
     return {
       isValid: false,
       message:
-        "Invalid cURL command syntax. Please check for typos or try validating it on an online tool like reqbin.com/curl-online.",
+        "无效的 cURL 命令语法。请检查拼写或尝试使用在线工具（如 reqbin.com/curl-online）验证。",
     };
   }
 
@@ -36,7 +36,7 @@ export const validateCurl = (
       .join(", ");
     return {
       isValid: false,
-      message: `The following required variables are missing: ${missingVarsString}.`,
+      message: `缺少以下必需变量：${missingVarsString}。`,
     };
   }
 

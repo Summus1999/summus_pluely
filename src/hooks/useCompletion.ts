@@ -184,7 +184,7 @@ export const useCompletion = () => {
         if (!selectedAIProvider.provider && !usePluelyAPI) {
           setState((prev) => ({
             ...prev,
-            error: "Please select an AI provider in settings",
+            error: "请在设置中选择一个 AI 服务商",
           }));
           return;
         }
@@ -195,7 +195,7 @@ export const useCompletion = () => {
         if (!provider && !usePluelyAPI) {
           setState((prev) => ({
             ...prev,
-            error: "Invalid provider selected",
+            error: "所选服务商无效",
           }));
           return;
         }
@@ -430,7 +430,7 @@ export const useCompletion = () => {
         // Show error to user
         setState((prev) => ({
           ...prev,
-          error: "Failed to save conversation. Please try again.",
+          error: "保存对话失败，请重试。",
         }));
       }
     },
@@ -448,7 +448,7 @@ export const useCompletion = () => {
         console.error("No conversation ID provided");
         setState((prev) => ({
           ...prev,
-          error: "Invalid conversation selected",
+          error: "所选对话无效",
         }));
         return;
       }
@@ -463,14 +463,14 @@ export const useCompletion = () => {
           console.error(`Conversation ${id} not found in database`);
           setState((prev) => ({
             ...prev,
-            error: "Conversation not found. It may have been deleted.",
+            error: "未找到对话，可能已被删除。",
           }));
         }
       } catch (error) {
         console.error("Failed to load conversation:", error);
         setState((prev) => ({
           ...prev,
-          error: "Failed to load conversation. Please try again.",
+          error: "加载对话失败，请重试。",
         }));
       }
     };
@@ -587,7 +587,7 @@ export const useCompletion = () => {
             if (!selectedAIProvider.provider && !usePluelyAPI) {
               setState((prev) => ({
                 ...prev,
-                error: "Please select an AI provider in settings",
+                error: "请在设置中选择一个 AI 服务商",
               }));
               return;
             }
@@ -598,7 +598,7 @@ export const useCompletion = () => {
             if (!provider && !usePluelyAPI) {
               setState((prev) => ({
                 ...prev,
-                error: "Invalid provider selected",
+                error: "所选服务商无效",
               }));
               return;
             }
@@ -876,7 +876,7 @@ export const useCompletion = () => {
             setState((prev) => ({
               ...prev,
               error:
-                "Screen Recording permission required. Please enable it by going to System Settings > Privacy & Security > Screen & System Audio Recording. If you don't see Pluely in the list, click the '+' button to add it. If it's already listed, make sure it's enabled. Then restart the app.",
+                "需要屏幕录制权限。请前往「系统设置 > 隐私与安全性 > 屏幕与系统音频录制」开启。如果列表中没有 Pluely，请点击「+」按钮添加。如果已在列表中，请确保已启用。然后重启应用。",
             }));
             setIsScreenshotLoading(false);
             screenshotInitiatedByThisContext.current = false;
@@ -905,7 +905,7 @@ export const useCompletion = () => {
     } catch (error) {
       setState((prev) => ({
         ...prev,
-        error: "Failed to capture screenshot. Please try again.",
+        error: "截图失败，请重试。",
       }));
       isProcessingScreenshotRef.current = false;
       screenshotInitiatedByThisContext.current = false;

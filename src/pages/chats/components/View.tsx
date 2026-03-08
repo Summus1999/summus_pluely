@@ -100,11 +100,11 @@ const View = () => {
             {isAttached ? (
               <>
                 <Check className="size-3 lg:size-4 text-green-600" />
-                Attached
+                已附加
               </>
             ) : (
               <>
-                Open in Overlay{" "}
+                在悬浮窗中打开{" "}
                 <MessageCircleReplyIcon className="size-3 lg:size-4" />
               </>
             )}
@@ -119,11 +119,11 @@ const View = () => {
             {isDownloaded ? (
               <>
                 <Check className="size-3 lg:size-4 text-green-600" />
-                Downloaded
+                已下载
               </>
             ) : (
               <>
-                Download <Download className="size-3 lg:size-4" />
+                下载 <Download className="size-3 lg:size-4" />
               </>
             )}
           </Button>
@@ -135,7 +135,7 @@ const View = () => {
             }
             className="text-[10px] lg:text-sm h-6 lg:h-8"
           >
-            Delete <Trash2 className="size-3 lg:size-4" />
+            删除 <Trash2 className="size-3 lg:size-4" />
           </Button>
         </div>
       }
@@ -164,7 +164,7 @@ const View = () => {
                     variant={"outline"}
                     className="flex items-center justify-center my-4 w-fit mx-auto"
                   >
-                    {moment(message.timestamp).format("ddd, MMM D")}
+                    {moment(message.timestamp).format("YYYY年M月D日 ddd")}
                   </Badge>
                 )}
 
@@ -204,7 +204,7 @@ const View = () => {
                         isUser ? "-mr-1" : "-ml-1"
                       }`}
                     >
-                      {moment(message.timestamp).format("hh:mm A")}
+                      {moment(message.timestamp).format("HH:mm")}
                     </Badge>
                   </div>
 
@@ -229,7 +229,7 @@ const View = () => {
         {completion.error && (
           <div className="px-4 pt-3 pb-0">
             <div className="p-2 bg-destructive/10 border border-destructive/20 rounded text-sm text-destructive">
-              <strong>Error:</strong> {completion.error}
+              <strong>错误：</strong> {completion.error}
             </div>
           </div>
         )}

@@ -37,8 +37,8 @@ const Dashboard = () => {
 
   return (
     <PageLayout
-      title="Dashboard"
-      description="Manage your AI providers, models and settings."
+      title="控制台"
+      description="管理你的 AI 服务商、模型和设置。"
     >
       {/* Pluely API Setup */}
       <PluelyApiSetup />

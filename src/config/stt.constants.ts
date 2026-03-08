@@ -18,7 +18,7 @@ export const SPEECH_TO_TEXT_PROVIDERS = [
       -F model={{MODEL}} \\
       -F temperature=0 \\
       -F response_format=text \\
-      -F language=en`,
+      -F language=zh`,
     responseContentPath: "text",
     streaming: false,
   },
@@ -43,7 +43,7 @@ export const SPEECH_TO_TEXT_PROVIDERS = [
         "config": {
           "encoding": "LINEAR16", 
           "sampleRateHertz": 16000,
-          "languageCode": "en-US"
+          "languageCode": "zh-CN"
         },
         "audio": {
           "content": "{{AUDIO}}"
@@ -65,7 +65,7 @@ export const SPEECH_TO_TEXT_PROVIDERS = [
   {
     id: "azure-stt",
     name: "Azure Speech-to-Text",
-    curl: `curl -X POST "https://{{REGION}}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=en-US" \\
+    curl: `curl -X POST "https://{{REGION}}.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=zh-CN" \\
       -H "Ocp-Apim-Subscription-Key: {{API_KEY}}" \\
       -H "Content-Type: audio/wav" \\
       --data-binary {{AUDIO}}`,

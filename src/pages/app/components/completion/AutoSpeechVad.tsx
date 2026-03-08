@@ -47,7 +47,7 @@ const AutoSpeechVADInternal = ({
           setState((prev: any) => ({
             ...prev,
             error:
-              "No speech provider selected. Please select one in settings.",
+              "未选择语音服务商，请在设置中选择一个。",
           }));
           return;
         }
@@ -61,7 +61,7 @@ const AutoSpeechVADInternal = ({
           setState((prev: any) => ({
             ...prev,
             error:
-              "Speech provider configuration not found. Please check your settings.",
+              "未找到语音服务商配置，请检查设置。",
           }));
           return;
         }
@@ -83,7 +83,7 @@ const AutoSpeechVADInternal = ({
         setState((prev: any) => ({
           ...prev,
           error:
-            error instanceof Error ? error.message : "Transcription failed",
+            error instanceof Error ? error.message : "转录失败",
         }));
       } finally {
         setIsTranscribing(false);

@@ -149,7 +149,7 @@ export const ChatFiles = ({
                 variant="outline"
               >
                 <PlusIcon className="h-4 w-4 mr-2" />
-                Add More {!canAddMore && `(${MAX_FILES} max)`}
+                添加更多 {!canAddMore && `（最多 ${MAX_FILES} 张）`}
               </Button>
               <Button
                 className="w-2/4"
@@ -157,7 +157,7 @@ export const ChatFiles = ({
                 onClick={onRemoveAllFiles}
               >
                 <TrashIcon className="h-4 w-4 mr-2" />
-                Remove All
+                全部移除
               </Button>
             </div>
           </PopoverContent>

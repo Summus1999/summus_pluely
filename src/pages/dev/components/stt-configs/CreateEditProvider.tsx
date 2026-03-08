@@ -107,22 +107,19 @@ export const CreateEditProvider = ({
               <div className="bg-muted/50 p-4 rounded-lg space-y-4">
                 <div className="bg-card border p-3 rounded-lg">
                   <p className="text-sm font-medium text-primary mb-2">
-                    💡 Important: You can add custom variables or directly
-                    include your API keys/values
+                    💡 重要提示：你可以添加自定义变量，也可以直接填入你的 API 密钥/值
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    No need to enter variables separately when selecting the
-                    provider - you can embed them directly in the curl command
-                    (e.g., replace YOUR_API_KEY with your actual key or use{" "}
+                    选择服务商时无需单独输入变量——你可以直接在 curl 命令中嵌入（例如，将 YOUR_API_KEY 替换为你的实际密钥，或使用{" "}
                     <code className="bg-muted px-1 rounded text-xs">
                       {"{{MODEL}}"}
                     </code>{" "}
-                    for model name).
+                    作为模型名称）。
                   </p>
                 </div>
 
                 <h4 className="text-sm font-semibold text-foreground">
-                  ⚠️ Required Variables for STT Providers:
+                  ⚠️ STT 服务商必需变量：
                 </h4>
                 <div className="grid grid-cols-1 gap-3 text-sm">
                   <div className="flex items-center gap-3 p-3 bg-card border rounded-lg">
@@ -130,40 +127,36 @@ export const CreateEditProvider = ({
                       {"{{AUDIO}}"}
                     </code>
                     <span className="text-foreground font-medium">
-                      → REQUIRED: Base64 encoded audio data or audio file as wav
-                      file if you are using multipart/form-data (using -F or
-                      --form)
+                      → 必需：Base64 编码的音频数据，或使用 multipart/form-data（-F 或 --form）时为 wav 音频文件
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    <strong className="text-foreground">Quick Setup:</strong>{" "}
-                    Replace{" "}
+                    <strong className="text-foreground">快速设置：</strong>{" "}
+                    在 curl 命令中将{" "}
                     <code className="bg-muted px-1 rounded text-xs">
                       YOUR_API_KEY
                     </code>{" "}
-                    with your actual API key directly in the curl command.
+                    直接替换为你的实际 API 密钥。
                   </p>
                   <p className="text-sm text-muted-foreground">
                     <strong className="text-foreground">
-                      Custom Variables:
+                      自定义变量：
                     </strong>{" "}
-                    You can add your own variables using the same{" "}
+                    你可以使用相同的{" "}
                     <code className="bg-muted px-1 rounded text-xs">
                       {"{{VARIABLE_NAME}}"}
                     </code>{" "}
-                    format and they'll be available for configuration when you
-                    select this provider.
+                    格式添加自己的变量，选择该服务商时即可进行配置。
                   </p>
                   <p className="text-xs text-muted-foreground italic">
-                    💡 Tip: The{" "}
+                    💡 提示：{" "}
                     <code className="bg-muted px-1 rounded text-xs">
                       {"{{AUDIO}}"}
                     </code>{" "}
-                    variable is essential for STT functionality - make sure it's
-                    properly included in your curl command.
+                    变量对 STT 功能至关重要——请确保在 curl 命令中正确包含它。
                   </p>
                 </div>
               </div>
@@ -208,7 +201,7 @@ export const CreateEditProvider = ({
                 }))
               }
               error={errors.responseContentPath}
-              notes="The path to extract content from the API response. Examples: text, transcript, results[0].alternatives[0].transcript"
+              notes="从 API 响应中提取内容的路径。示例：text、transcript、results[0].alternatives[0].transcript"
             />
           </div>
 

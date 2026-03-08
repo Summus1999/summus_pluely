@@ -343,7 +343,7 @@ export async function* fetchAIResponse(params: {
     }
 
     if (!response.body) {
-      yield "Streaming not supported or response body missing";
+      yield "不支持流式传输或响应体缺失";
       return;
     }
 

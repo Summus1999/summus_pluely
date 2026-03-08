@@ -64,7 +64,7 @@ const Dashboard = () => {
               .map((dateKey) => (
                 <div key={dateKey} className="flex flex-col gap-3">
                   <p className="text-xs text-muted-foreground select-none font-medium">
-                    {moment(dateKey).format("ddd, MMM D")}
+                    {moment(dateKey).format("YYYY年M月D日 ddd")}
                   </p>
                   <div className="grid grid-cols-1 gap-3">
                     {groupedConversations[dateKey].map((doc) => (
@@ -79,10 +79,10 @@ const Dashboard = () => {
                           </p>
                           <div className="flex items-center gap-1">
                             <Badge variant="outline" className="text-xs">
-                              {doc.messages.length} messages
+                              {doc.messages.length} 条消息
                             </Badge>
                             <Badge variant="outline" className="text-xs">
-                              {moment(doc.updatedAt).format("hh:mm A")}
+                              {moment(doc.updatedAt).format("HH:mm")}
                             </Badge>
                           </div>
                         </div>

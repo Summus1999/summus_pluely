@@ -36,7 +36,7 @@ export const RecordingPanel = ({
             <div className="flex items-center justify-end gap-1.5">
               <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />
               <span className="text-[9px] text-muted-foreground">
-                {isProcessing ? "Transcribing..." : "Generating..."}
+                {isProcessing ? "转录中..." : "生成中..."}
               </span>
             </div>
           )}
@@ -52,7 +52,7 @@ export const RecordingPanel = ({
                     size="sm"
                   >
                     <MicIcon className="w-3.5 h-3.5" />
-                    Start Recording
+                    开始录音
                   </Button>
                 ) : (
                   <>
@@ -63,7 +63,7 @@ export const RecordingPanel = ({
                       className="flex-1 gap-1"
                     >
                       <XIcon className="w-3 h-3" />
-                      Discard
+                      丢弃
                     </Button>
                     <Button
                       onClick={onStopAndSend}
@@ -71,7 +71,7 @@ export const RecordingPanel = ({
                       className="flex-1 gap-1"
                     >
                       <StopCircleIcon className="w-3 h-3" />
-                      Stop & Send
+                      停止并发送
                     </Button>
                   </>
                 )}
@@ -91,9 +91,9 @@ export const RecordingPanel = ({
                   <div className="flex justify-between text-[9px] text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                      Recording {recordingProgress}s
+                      录音中 {recordingProgress}s
                     </span>
-                    <span>{maxDuration}s max</span>
+                    <span>{maxDuration}s 上限</span>
                   </div>
                 </div>
               )}
@@ -117,13 +117,13 @@ export const RecordingPanel = ({
                       <kbd className="px-1 py-0.5 rounded bg-muted font-mono">
                         Enter
                       </kbd>{" "}
-                      send
+                      发送
                     </span>
                     <span>
                       <kbd className="px-1 py-0.5 rounded bg-muted font-mono">
                         Esc
                       </kbd>{" "}
-                      discard
+                      丢弃
                     </span>
                   </>
                 )}

@@ -56,15 +56,15 @@ export const ChatAudio = ({
       >
         <div className="text-sm">
           <div className="font-semibold text-orange-600 mb-1">
-            Speech Provider Required
+            需要配置语音服务商
           </div>
           <p className="text-muted-foreground">
             <div className="mt-2 flex items-center gap-1 text-orange-600">
               <InfoIcon size={16} />
-              <span>Provider not configured</span>
+              <span>服务商未配置</span>
             </div>
             <span className="block mt-2">
-              Configure a speech provider in settings to enable voice input.
+              请在设置中配置语音服务商以启用语音输入。
             </span>
           </p>
         </div>

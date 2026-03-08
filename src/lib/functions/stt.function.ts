@@ -228,7 +228,7 @@ export async function fetchSTT(params: STTParams): Promise<string> {
     const transcription = (getByPath(data, path) || "").trim();
 
     if (!transcription) {
-      return [...warnings, "No transcription found"].join("; ");
+      return [...warnings, "未找到转录结果"].join("; ");
     }
 
     // Return transcription with any warnings

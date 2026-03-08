@@ -26,7 +26,7 @@ export const Sidebar = () => {
             Pluely
           </h1>
           <span className="text-[8px] lg:text-[10px] text-muted-foreground -mt-1 block">
-            {isLoading ? "Loading..." : `(v${version})`}
+            {isLoading ? "加载中..." : `(v${version})`}
           </span>
         </div>
       </div>

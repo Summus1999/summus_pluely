@@ -37,7 +37,7 @@ export const ResultsSection = ({
         <div className="flex items-center gap-1.5">
           <SparklesIcon className="w-3.5 h-3.5 text-primary" />
           <h4 className="text-xs font-medium">
-            {conversationMode ? "Conversation" : "AI Response"}
+            {conversationMode ? "对话" : "AI 响应"}
           </h4>
         </div>
         <div className="flex items-center gap-2 select-none">
@@ -59,7 +59,7 @@ export const ResultsSection = ({
           {/* System Input - Just text with bold label */}
           {lastTranscription && (
             <p className="text-[11px] text-muted-foreground">
-              <span className="font-semibold">System:</span> {lastTranscription}
+              <span className="font-semibold">系统：</span> {lastTranscription}
             </p>
           )}
 
@@ -70,7 +70,7 @@ export const ResultsSection = ({
                 <div className="flex items-center gap-2 py-2">
                   <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   <span className="text-xs text-muted-foreground">
-                    Generating response...
+                    正在生成响应...
                   </span>
                 </div>
               ) : (
@@ -102,7 +102,7 @@ export const ResultsSection = ({
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
                   <span className="text-[10px] text-muted-foreground">
-                    Generating...
+                    生成中...
                   </span>
                 </div>
               ) : (
@@ -133,7 +133,7 @@ export const ResultsSection = ({
           {hasHistory && (
             <div className="space-y-2 pt-2 border-t border-border/50">
               <p className="text-[9px] text-muted-foreground uppercase tracking-wide">
-                Previous
+                历史记录
               </p>
               <div className="space-y-1.5 max-h-40 overflow-y-auto">
                 {conversation.messages

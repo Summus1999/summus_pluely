@@ -9,6 +9,6 @@ export const getAppVersion = async (): Promise<string> => {
     return version;
   } catch (error) {
     console.error("Failed to get app version:", error);
-    return "Unknown";
+    return "未知";
   }
 };

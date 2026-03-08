@@ -119,7 +119,7 @@ export const PluelyPrompts = () => {
     } catch (err) {
       console.error("Failed to fetch Pluely prompts:", err);
       setError(
-        typeof err === "string" ? err : "Failed to fetch Pluely prompts"
+        typeof err === "string" ? err : "获取 Pluely 提示词失败"
       );
     } finally {
       setIsLoading(false);
@@ -233,7 +233,7 @@ export const PluelyPrompts = () => {
         <div className="flex items-start gap-3 w-full">
           <div className="flex flex-col gap-1 w-full">
             <Header
-              title="Pluely Default Prompts"
+              title="Pluely 默认提示词"
               description="预配置提示词与推荐模型搭配。选择提示词将自动设置推荐的 AI 模型以获得最佳效果。"
             />
             {lastUpdated && (

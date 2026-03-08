@@ -188,7 +188,7 @@ const SystemPrompts = () => {
         </div>
         <Button variant="default" size="default" onClick={handleCreateClick}>
           <PlusIcon className="size-4" />
-          Create New
+          新建
         </Button>
       </div>
       {filteredPrompts.length === 0 ? (
@@ -252,7 +252,7 @@ const SystemPrompts = () => {
                         }}
                       >
                         <Pencil className="size-4 mr-2" />
-                        Edit
+                        编辑
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         variant="destructive"
@@ -262,7 +262,7 @@ const SystemPrompts = () => {
                         }}
                       >
                         <Trash2 className="size-4 mr-2" />
-                        Delete
+                        删除
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

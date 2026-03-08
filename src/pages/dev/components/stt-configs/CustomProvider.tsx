@@ -40,7 +40,7 @@ export const CustomProviders = ({ allSttProviders }: UseSettingsReturn) => {
                     <div className="flex items-center justify-between">
                       <div>
                         <h4 className="font-medium text-sm">
-                          {json?.url || "Invalid curl command"}
+                          {json?.url || "无效的 curl 命令"}
                         </h4>
 
                         <div className="flex items-center gap-2 mt-1">

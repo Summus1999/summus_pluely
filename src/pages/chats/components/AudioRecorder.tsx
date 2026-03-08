@@ -183,7 +183,7 @@ export const AudioRecorder = ({
           </div>
         ) : (
           <div className="h-full flex items-center justify-center text-sm text-muted-foreground">
-            Initializing...
+            初始化中...
           </div>
         )}
       </div>

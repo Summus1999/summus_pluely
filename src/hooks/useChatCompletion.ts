@@ -179,7 +179,7 @@ export const useChatCompletion = (
         if (!selectedAIProvider.provider && !usePluelyAPI) {
           setState((prev) => ({
             ...prev,
-            error: "Please select an AI provider in settings",
+            error: "请在设置中选择一个 AI 服务商",
           }));
           return;
         }
@@ -190,7 +190,7 @@ export const useChatCompletion = (
         if (!provider && !usePluelyAPI) {
           setState((prev) => ({
             ...prev,
-            error: "Invalid provider selected",
+            error: "所选服务商无效",
           }));
           return;
         }
@@ -359,7 +359,7 @@ export const useChatCompletion = (
             console.error("Failed to save conversation:", error);
             setState((prev) => ({
               ...prev,
-              error: "Failed to save conversation. Please try again.",
+              error: "保存对话失败，请重试。",
             }));
           }
         }
@@ -567,7 +567,7 @@ export const useChatCompletion = (
             setState((prev) => ({
               ...prev,
               error:
-                "Screen Recording permission required. Please enable it by going to System Settings > Privacy & Security > Screen & System Audio Recording. If you don't see Pluely in the list, click the '+' button to add it. If it's already listed, make sure it's enabled. Then restart the app.",
+                "需要屏幕录制权限。请前往「系统设置 > 隐私与安全性 > 屏幕与系统音频录制」开启。如果列表中没有 Pluely，请点击「+」按钮添加。如果已在列表中，请确保已启用。然后重启应用。",
             }));
             setIsScreenshotLoading(false);
             screenshotInitiatedByThisContext.current = false;
@@ -597,7 +597,7 @@ export const useChatCompletion = (
     } catch (error) {
       setState((prev) => ({
         ...prev,
-        error: "Failed to capture screenshot. Please try again.",
+        error: "截图失败，请重试。",
       }));
       isProcessingScreenshotRef.current = false;
       screenshotInitiatedByThisContext.current = false;

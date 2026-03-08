@@ -142,28 +142,28 @@ export const Updater = () => {
         return (
           <>
             <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-            Installing...
+            正在安装...
           </>
         );
       case "ready":
         return (
           <>
             <CheckCircle className="mr-2 h-4 w-4" />
-            Ready - Restarting...
+            准备就绪 - 正在重启...
           </>
         );
       case "error":
         return (
           <>
             <AlertCircle className="mr-2 h-4 w-4" />
-            Try Again
+            重试
           </>
         );
       default:
         return (
           <>
             <Download className="mr-2 h-4 w-4" />
-            Download & Install Update
+            下载并安装更新
           </>
         );
     }
@@ -212,8 +212,8 @@ export const Updater = () => {
           onClick={handleTriggerClick}
           className="cursor-pointer"
           disabled={updateState === "checking"}
-          title={`Update available: ${update?.version}`}
-          aria-label={`Update available: ${update?.version}`}
+          title={`有新版本可用：${update?.version}`}
+          aria-label={`有新版本可用：${update?.version}`}
         >
           {updateState === "checking" ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -234,11 +234,10 @@ export const Updater = () => {
             {/* Update Header */}
             <div className="border-b border-input/50 pb-2">
               <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                Update Available
+                发现新版本
               </h1>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                A new version ({update?.version}) is available. Here's what's
-                new:
+                新版本 ({update?.version}) 已可用。以下是更新内容：
               </p>
             </div>
 
@@ -248,7 +247,7 @@ export const Updater = () => {
                 <Markdown>{update.body}</Markdown>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  Release notes not available for this version.
+                  此版本暂无更新日志。
                 </p>
               )}
             </div>
@@ -268,14 +267,14 @@ export const Updater = () => {
 
           <div className="text-center">
             <p className="text-xs text-muted-foreground">
-              Having trouble downloading?{" "}
+              下载遇到问题？{" "}
               <a
                 href={"https://pluely.com/downloads?ref=pluely-app"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-700 underline inline-flex items-center gap-1"
               >
-                Download manually
+                手动下载
                 <ExternalLink className="h-3 w-3" />
               </a>
             </p>

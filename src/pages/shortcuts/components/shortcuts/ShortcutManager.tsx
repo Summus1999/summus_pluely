@@ -151,7 +151,7 @@ export const ShortcutManager = () => {
             title="重置所有快捷键为平台默认"
           >
             <RotateCcw className="size-3 lg:size-4" />
-            Reset
+            重置
           </Button>
         </div>
       </div>
@@ -255,11 +255,11 @@ export const ShortcutManager = () => {
                       className="min-w-[80px]"
                       title={
                         isLocked
-                          ? "License required to customize"
-                          : "Change this shortcut"
+                          ? "需要许可证才能自定义"
+                          : "更改此快捷键"
                       }
                     >
-                      Change
+                      修改
                     </Button>
                   </div>
                 </div>
@@ -271,7 +271,7 @@ export const ShortcutManager = () => {
 
       {/* Footer Note */}
       <p className="text-xs text-muted-foreground text-center pt-2">
-        💡 Shortcuts work globally, even when the app is hidden
+        💡 快捷键全局生效，即使应用隐藏时也可以使用
       </p>
     </div>
   );
