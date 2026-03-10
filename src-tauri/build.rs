@@ -1,4 +1,7 @@
 fn main() {
+    // Declare cargo_clippy as expected cfg to suppress unexpected_cfgs lint from objc/tauri-nspanel
+    println!("cargo::rustc-check-cfg=cfg(cargo_clippy)");
+
     dotenv::dotenv().ok();
 
     if let Ok(payment_endpoint) = std::env::var("PAYMENT_ENDPOINT") {

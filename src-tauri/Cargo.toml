@@ -66,3 +66,7 @@ libpulse-simple-binding = "2.29.0"
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
 tauri-plugin-autostart = "2.5.0"
+
+[lints.rust]
+# Suppress unexpected_cfgs from objc crate (used by tauri-nspanel on macOS)
+unexpected_cfgs = { level = "allow", check-cfg = ["cfg(cargo_clippy)", "cfg(feature, values(\"cargo-clippy\"))"] }

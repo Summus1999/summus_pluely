@@ -501,7 +501,7 @@ pub fn validate_shortcut_key(key: String) -> Result<bool, String> {
 }
 
 #[tauri::command]
-pub fn set_license_status<R: Runtime>(app: AppHandle<R>, has_license: bool) -> Result<(), String> {
+pub fn set_license_status<R: Runtime>(app: AppHandle<R>, _has_license: bool) -> Result<(), String> {
     {
         let state = app.state::<LicenseState>();
         state.set_active(true); // Always active
