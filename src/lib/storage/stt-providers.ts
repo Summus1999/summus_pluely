@@ -1,7 +1,7 @@
 import { STORAGE_KEYS } from "@/config";
-import { TYPE_PROVIDER } from "@/types";
+import { ProviderConfig } from "@/types";
 
-export function getCustomSttProviders(): TYPE_PROVIDER[] {
+export function getCustomSttProviders(): ProviderConfig[] {
   try {
     if (typeof window === "undefined") return [];
     const saved = localStorage.getItem(STORAGE_KEYS.CUSTOM_SPEECH_PROVIDERS);
@@ -15,7 +15,7 @@ export function getCustomSttProviders(): TYPE_PROVIDER[] {
   }
 }
 
-export function setCustomSttProviders(providers: TYPE_PROVIDER[]): void {
+export function setCustomSttProviders(providers: ProviderConfig[]): void {
   try {
     if (typeof window === "undefined") return;
     localStorage.setItem(
@@ -28,12 +28,12 @@ export function setCustomSttProviders(providers: TYPE_PROVIDER[]): void {
 }
 
 export function addCustomSttProvider(
-  newProvider: Omit<TYPE_PROVIDER, "id" | "isCustom">
-): TYPE_PROVIDER | null {
+  newProvider: Omit<ProviderConfig, "id" | "isCustom">
+): ProviderConfig | null {
   try {
     const providers = getCustomSttProviders();
     const id = `custom-stt-${Date.now()}`;
-    const provider: TYPE_PROVIDER = {
+    const provider: ProviderConfig = {
       ...newProvider,
       id,
       isCustom: true,
@@ -49,7 +49,7 @@ export function addCustomSttProvider(
 
 export function updateCustomSttProvider(
   id: string,
-  updates: Partial<TYPE_PROVIDER>
+  updates: Partial<ProviderConfig>
 ): boolean {
   try {
     const providers = getCustomSttProviders();

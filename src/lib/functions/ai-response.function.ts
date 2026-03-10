@@ -5,7 +5,7 @@ import {
   getByPath,
   getStreamingContent,
 } from "./common.function";
-import { Message, TYPE_PROVIDER } from "@/types";
+import { Message, ProviderConfig } from "@/types";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import curl2Json from "@bany/curl-to-json";
 import { getResponseSettings, RESPONSE_LENGTHS, LANGUAGES } from "@/lib";
@@ -40,7 +40,7 @@ function buildEnhancedSystemPrompt(baseSystemPrompt?: string): string {
 }
 
 export async function* fetchAIResponse(params: {
-  provider: TYPE_PROVIDER | undefined;
+  provider: ProviderConfig | undefined;
   selectedProvider: {
     provider: string;
     variables: Record<string, string>;

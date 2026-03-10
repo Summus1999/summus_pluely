@@ -6,11 +6,11 @@ import {
 } from "./common.function";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 
-import { TYPE_PROVIDER } from "@/types";
+import { ProviderConfig } from "@/types";
 import curl2Json from "@bany/curl-to-json";
 
 export interface STTParams {
-  provider: TYPE_PROVIDER | undefined;
+  provider: ProviderConfig | undefined;
   selectedProvider: {
     provider: string;
     variables: Record<string, string>;

@@ -13,9 +13,9 @@ import { useCustomSttProviders } from "@/hooks";
 import { extractVariables } from "@/lib";
 import { EditIcon, KeyIcon, PlusIcon, SaveIcon, TrashIcon } from "lucide-react";
 import curl2Json from "@bany/curl-to-json";
-import { TYPE_PROVIDER } from "@/types";
+import { ProviderConfig } from "@/types";
 
-const createCustomSttFormData = (): TYPE_PROVIDER => ({
+const createCustomSttFormData = (): ProviderConfig => ({
   id: "",
   streaming: false,
   responseContentPath: "",
@@ -23,7 +23,7 @@ const createCustomSttFormData = (): TYPE_PROVIDER => ({
   curl: "",
 });
 
-const getProviderLabel = (provider?: TYPE_PROVIDER & { name?: string }) => {
+const getProviderLabel = (provider?: ProviderConfig & { name?: string }) => {
   if (!provider) return "未命名服务商";
 
   try {
@@ -234,7 +234,7 @@ function VariableFields({
 function CustomSttProviderManager({
   allSttProviders,
 }: {
-  allSttProviders: TYPE_PROVIDER[];
+  allSttProviders: ProviderConfig[];
 }) {
   const customProviderHook = useCustomSttProviders();
   const {

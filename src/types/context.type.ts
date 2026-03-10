@@ -1,11 +1,16 @@
-import { Dispatch, SetStateAction } from "react";
-import { ScreenshotConfig, TYPE_PROVIDER } from "@/types";
+import React, { Dispatch, SetStateAction } from "react";
+import { ScreenshotConfig, ProviderConfig } from "@/types";
 import { CursorType, CustomizableState } from "@/lib/storage";
 
-export type IContextType = {
+/**
+ * App Context Type - 应用上下文类型定义
+ *
+ * 定义应用全局状态的结构和方法
+ */
+export interface AppContextType {
   systemPrompt: string;
   setSystemPrompt: Dispatch<SetStateAction<string>>;
-  allAiProviders: TYPE_PROVIDER[];
+  allAiProviders: ProviderConfig[];
   selectedAIProvider: {
     provider: string;
     variables: Record<string, string>;
@@ -17,8 +22,8 @@ export type IContextType = {
     provider: string;
     variables: Record<string, string>;
   }) => void;
-  allSttProviders: TYPE_PROVIDER[];
-  customSttProviders: TYPE_PROVIDER[];
+  allSttProviders: ProviderConfig[];
+  customSttProviders: ProviderConfig[];
   selectedSttProvider: {
     provider: string;
     variables: Record<string, string>;

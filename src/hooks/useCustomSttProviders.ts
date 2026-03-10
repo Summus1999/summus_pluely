@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TYPE_PROVIDER } from "@/types";
+import { ProviderConfig } from "@/types";
 import { SPEECH_TO_TEXT_PROVIDERS } from "@/config";
 import { useApp } from "@/contexts";
 import {
@@ -12,7 +12,7 @@ import {
 
 export function useCustomSttProviders() {
   const { loadData } = useApp();
-  const getInitialFormData = (): TYPE_PROVIDER => ({
+  const getInitialFormData = (): ProviderConfig => ({
     id: "",
     streaming: false,
     responseContentPath: "",
@@ -21,7 +21,7 @@ export function useCustomSttProviders() {
   });
   const [showForm, setShowForm] = useState(false);
   const [editingProvider, setEditingProvider] = useState<string | null>(null);
-  const [formData, setFormData] = useState<TYPE_PROVIDER>(getInitialFormData());
+  const [formData, setFormData] = useState<ProviderConfig>(getInitialFormData());
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);

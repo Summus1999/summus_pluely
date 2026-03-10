@@ -17,7 +17,7 @@ import {
   CursorType,
   updateCursorType,
 } from "@/lib/storage";
-import { IContextType, ScreenshotConfig, TYPE_PROVIDER } from "@/types";
+import { IContextType, ScreenshotConfig, ProviderConfig } from "@/types";
 import curl2Json from "@bany/curl-to-json";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -32,7 +32,7 @@ import {
   useState,
 } from "react";
 
-const validateAndProcessSttProviders = (providersJson: string): TYPE_PROVIDER[] => {
+const validateAndProcessSttProviders = (providersJson: string): ProviderConfig[] => {
   try {
     const parsed = JSON.parse(providersJson);
     if (!Array.isArray(parsed)) {
@@ -101,7 +101,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   });
 
   // STT Providers
-  const [customSttProviders, setCustomSttProviders] = useState<TYPE_PROVIDER[]>(
+  const [customSttProviders, setCustomSttProviders] = useState<ProviderConfig[]>(
     []
   );
   const [selectedSttProvider, setSelectedSttProvider] = useState<{
@@ -208,7 +208,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const savedStt = safeLocalStorage.getItem(
       STORAGE_KEYS.CUSTOM_SPEECH_PROVIDERS
     );
-    let sttList: TYPE_PROVIDER[] = [];
+    let sttList: ProviderConfig[] = [];
     if (savedStt) {
       sttList = validateAndProcessSttProviders(savedStt);
     }
@@ -483,10 +483,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [selectedSttProvider]);
 
   // Computed all AI providers
-  const allAiProviders: TYPE_PROVIDER[] = AI_PROVIDERS;
+  const allAiProviders: ProviderConfig[] = AI_PROVIDERS;
 
   // Computed all STT providers
-  const allSttProviders: TYPE_PROVIDER[] = [
+  const allSttProviders: ProviderConfig[] = [
     ...SPEECH_TO_TEXT_PROVIDERS,
     ...customSttProviders,
   ];
