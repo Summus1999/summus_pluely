@@ -157,7 +157,7 @@ export async function* fetchAIResponse(params: {
       }
     }
 
-    const fetchFunction = url?.includes("http") ? fetch : tauriFetch;
+    const fetchFunction = url?.includes("http") ? tauriFetch : fetch;
 
     let response;
     try {
