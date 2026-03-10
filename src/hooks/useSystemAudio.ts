@@ -266,6 +266,12 @@ export function useSystemAudio() {
             if (!capturingRef.current) return;
 
             const base64Audio = event.payload as string;
+
+            // F14: speech_detected_received
+            console.info("[system-audio] speech_detected_received", {
+              sessionId,
+              payloadSize: base64Audio.length,
+            });
             // Convert to blob
             const binaryString = atob(base64Audio);
             const bytes = new Uint8Array(binaryString.length);
@@ -309,6 +315,12 @@ export function useSystemAudio() {
               );
             });
 
+            // F15: stt_request_started
+            console.info("[system-audio] stt_request_started", {
+              sessionId,
+              providerId: selectedSttProvider.provider,
+            });
+
             try {
               const transcription = await Promise.race([
                 sttPromise,
@@ -319,12 +331,23 @@ export function useSystemAudio() {
                 sessionId !== captureSessionIdRef.current ||
                 !capturingRef.current
               ) {
+                // F16: stt_request_dropped_stale
+                console.warn("[system-audio] stt_request_dropped_stale", {
+                  sessionId,
+                  currentSessionId: captureSessionIdRef.current,
+                });
                 return;
               }
 
               if (transcription.trim()) {
                 setLastTranscription(transcription);
                 setError("");
+
+                // F17: stt_request_succeeded
+                console.info("[system-audio] stt_request_succeeded", {
+                  sessionId,
+                  transcriptionLength: transcription.length,
+                });
 
                 const effectiveSystemPrompt = useSystemPrompt
                   ? systemPrompt || DEFAULT_SYSTEM_PROMPT
@@ -343,6 +366,11 @@ export function useSystemAudio() {
                 setError("收到空的转录结果");
               }
             } catch (sttError: any) {
+              // F18: stt_request_failed
+              console.warn("[system-audio] stt_request_failed", {
+                sessionId,
+                reason: sttError.message,
+              });
               if (
                 sessionId === captureSessionIdRef.current &&
                 capturingRef.current
@@ -503,6 +531,14 @@ export function useSystemAudio() {
       abortActiveAIRequest();
       captureSessionIdRef.current += 1;
 
+      // F4: capture_stop_requested
+      const sessionId = captureSessionIdRef.current;
+      console.info("[system-audio] capture_stop_requested", {
+        sessionId,
+        closePopover,
+        clearOutputs,
+      });
+
       let stopError = "";
       try {
         await invoke<string>("stop_system_audio_capture");
@@ -542,6 +578,20 @@ export function useSystemAudio() {
         transitionRef.current = false;
       }
 
+      // F5: capture_stop_succeeded or capture_stop_failed
+      if (stopError === "") {
+        console.info("[system-audio] capture_stop_succeeded", {
+          sessionId,
+          result: "ok",
+        });
+      } else {
+        console.warn("[system-audio] capture_stop_failed", {
+          sessionId,
+          result: "failed",
+          reason: stopError,
+        });
+      }
+
       return stopError === "";
     },
     [abortActiveAIRequest, createEmptyConversation]
@@ -555,6 +605,14 @@ export function useSystemAudio() {
       transitionRef.current = true;
       setIsStartingCapture(true);
       setError("");
+
+      // F1: capture_start_requested
+      const sessionId = captureSessionIdRef.current + 1;
+      const mode = config.enabled ? "vad" : "manual";
+      console.info("[system-audio] capture_start_requested", {
+        sessionId,
+        mode,
+      });
 
       try {
         const hasAccess = await invoke<boolean>("check_system_audio_access");
@@ -578,6 +636,13 @@ export function useSystemAudio() {
 
         captureSessionIdRef.current += 1;
 
+        // F2: capture_start_succeeded
+        console.info("[system-audio] capture_start_succeeded", {
+          sessionId: captureSessionIdRef.current,
+          mode,
+          capturing: true,
+        });
+
         if (!preserveConversation || !conversation.id) {
           setConversation(createEmptyConversation());
         }
@@ -594,6 +659,11 @@ export function useSystemAudio() {
         return true;
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : String(err);
+        // F3: capture_start_failed
+        console.warn("[system-audio] capture_start_failed", {
+          sessionId,
+          reason: errorMessage,
+        });
         capturingRef.current = false;
         setCapturing(false);
         setIsContinuousMode(false);
@@ -618,6 +688,13 @@ export function useSystemAudio() {
 
   const restartCaptureSession = useCallback(
     async (config: VadConfig): Promise<boolean> => {
+      // F6: capture_restart_requested
+      const sessionId = captureSessionIdRef.current;
+      console.info("[system-audio] capture_restart_requested", {
+        sessionId,
+        configEnabled: config.enabled,
+      });
+
       const stopped = await stopCaptureSession({
         closePopover: false,
         clearOutputs: false,
@@ -688,6 +765,11 @@ export function useSystemAudio() {
       if (!isContinuousMode || !isRecordingInContinuousMode || isStoppingCapture)
         return;
 
+      // F13: manual_recording_discard_requested
+      console.info("[system-audio] manual_recording_discard_requested", {
+        sessionId: captureSessionIdRef.current,
+      });
+
       transitionRef.current = true;
       setError("");
       await invoke<string>("stop_system_audio_capture");
@@ -727,6 +809,12 @@ export function useSystemAudio() {
         setLastAIResponse("");
         setError("");
 
+        // F19: ai_request_started
+        console.info("[system-audio] ai_request_started", {
+          sessionId: aiSessionId,
+          providerId: selectedAIProvider.provider,
+        });
+
         let fullResponse = "";
 
         if (!selectedAIProvider.provider) {
@@ -743,6 +831,7 @@ export function useSystemAudio() {
         }
 
         try {
+          let chunkCount = 0;
           for await (const chunk of fetchAIResponse({
             provider,
             selectedProvider: selectedAIProvider,
@@ -752,11 +841,19 @@ export function useSystemAudio() {
             imagesBase64: [],
             signal,
           })) {
+            chunkCount++;
             if (
               signal.aborted ||
               aiSessionId !== captureSessionIdRef.current
             ) {
               aiFailed = true;
+              // F20: ai_stream_aborted_or_stale
+              console.warn("[system-audio] ai_stream_aborted_or_stale", {
+                sessionId: aiSessionId,
+                currentSessionId: captureSessionIdRef.current,
+                chunkCount,
+                responseChars: fullResponse.length,
+              });
               break;
             }
             fullResponse += chunk;
@@ -765,6 +862,11 @@ export function useSystemAudio() {
         } catch (aiError: any) {
           if (!signal.aborted) {
             aiFailed = true;
+            // F21: ai_stream_failed
+            console.warn("[system-audio] ai_stream_failed", {
+              sessionId: aiSessionId,
+              reason: aiError.message,
+            });
             setError(aiError.message || "Failed to get AI response");
           }
         }
@@ -775,6 +877,11 @@ export function useSystemAudio() {
           !signal.aborted &&
           aiSessionId === captureSessionIdRef.current
         ) {
+          // F23: ai_response_commit
+          console.info("[system-audio] ai_response_commit", {
+            sessionId: aiSessionId,
+            responseChars: fullResponse.length,
+          });
           const timestamp = Date.now();
           setConversation((prev) => ({
             ...prev,
@@ -817,6 +924,10 @@ export function useSystemAudio() {
   }, [startCaptureSession, vadConfig]);
 
   const stopCapture = useCallback(async () => {
+    // F12: hard_stop_requested
+    console.info("[system-audio] hard_stop_requested", {
+      sessionId: captureSessionIdRef.current,
+    });
     await stopCaptureSession({
       closePopover: true,
       clearOutputs: true,
@@ -830,6 +941,16 @@ export function useSystemAudio() {
     const canFlushContinuous =
       capturing && isContinuousMode && isRecordingInContinuousMode;
 
+    // F10: flush_requested (at entry, before guard check)
+    const sessionId = captureSessionIdRef.current;
+    const mode = !isContinuousMode ? "vad" : "manual";
+    const recording = isRecordingInContinuousMode;
+    console.info("[system-audio] flush_requested", {
+      sessionId,
+      mode,
+      recording,
+    });
+
     if (
       (!canFlushVad && !canFlushContinuous) ||
       isStartingCapture ||
@@ -837,6 +958,17 @@ export function useSystemAudio() {
       isFlushingCapture ||
       isAIProcessing
     ) {
+      // F11: flush_rejected_busy
+      let reason = "";
+      if (!canFlushVad && !canFlushContinuous) reason = "not_flushable";
+      else if (isStartingCapture) reason = "isStartingCapture";
+      else if (isStoppingCapture) reason = "isStoppingCapture";
+      else if (isFlushingCapture) reason = "isFlushingCapture";
+      else if (isAIProcessing) reason = "isAIProcessing";
+      console.info("[system-audio] flush_rejected_busy", {
+        sessionId,
+        reason,
+      });
       return;
     }
 
@@ -999,7 +1131,15 @@ export function useSystemAudio() {
 
   const startNewConversation = useCallback(() => {
     abortActiveAIRequest();
+    const oldSessionId = captureSessionIdRef.current;
     captureSessionIdRef.current += 1;
+
+    // F24: conversation_reset
+    console.info("[system-audio] conversation_reset", {
+      oldSessionId,
+      newSessionId: captureSessionIdRef.current,
+    });
+
     setConversation(createEmptyConversation());
     setLastTranscription("");
     setLastAIResponse("");
@@ -1016,12 +1156,32 @@ export function useSystemAudio() {
   const updateVadConfiguration = useCallback(async (config: VadConfig) => {
     try {
       const modeChanged = config.enabled !== vadConfig.enabled;
+      const fromMode = vadConfig.enabled ? "vad" : "manual";
+      const toMode = config.enabled ? "vad" : "manual";
+
+      // F7: mode_change_requested
+      console.info("[system-audio] mode_change_requested", {
+        fromMode,
+        toMode,
+        capturing,
+      });
+
       setVadConfig(config);
       safeLocalStorage.setItem("vad_config", JSON.stringify(config));
       await invoke("update_vad_config", { config });
 
       if (capturing && modeChanged) {
-        await restartCaptureSession(config);
+        // F8: mode_change_restart_begin
+        console.info("[system-audio] mode_change_restart_begin", {
+          sessionId: captureSessionIdRef.current,
+          toMode,
+        });
+        const result = await restartCaptureSession(config);
+        // F9: mode_change_restart_done
+        console.info("[system-audio] mode_change_restart_done", {
+          sessionId: captureSessionIdRef.current,
+          result: result ? "ok" : "failed",
+        });
       }
     } catch (error) {
       console.error("Failed to update VAD config:", error);

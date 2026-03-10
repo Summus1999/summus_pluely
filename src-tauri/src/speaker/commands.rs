@@ -12,7 +12,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter, Manager};
 use tauri_plugin_shell::ShellExt;
-use tracing::{error, warn};
+use tracing::{error, info, warn};
 
 // VAD Configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -52,6 +52,13 @@ pub async fn start_system_audio_capture(
 ) -> Result<(), String> {
     let state = app.state::<crate::AudioState>();
 
+    // R1: capture_command_start
+    let mode = vad_config
+        .as_ref()
+        .map(|c| c.enabled)
+        .unwrap_or(false);
+    info!("[speaker] capture_command_start mode={} device_id={:?}", mode, device_id);
+
     // Check if already capturing (atomic check)
     {
         let guard = state
@@ -60,7 +67,8 @@ pub async fn start_system_audio_capture(
             .map_err(|e| format!("Failed to acquire lock: {}", e))?;
 
         if guard.is_some() {
-            warn!("Capture already running");
+            // R2: capture_command_start_rejected
+            warn!("[speaker] capture_command_start_rejected reason=\"capture already running\"");
             return Err("Capture already running".to_string());
         }
     }
@@ -112,7 +120,14 @@ pub async fn start_system_audio_capture(
     let _ = app_clone.emit("capture-started", sr);
 
     let state_clone = app.state::<crate::AudioState>();
+
+    // R5: capture_task_spawned
+    let sample_rate = sr;
+    info!("[speaker] capture_task_spawned mode={} sample_rate={}", mode, sample_rate);
+
     let task = tokio::spawn(async move {
+        let task_mode = if vad_config.enabled { "vad" } else { "continuous" };
+
         if vad_config.enabled {
             run_vad_capture(
                 app_clone.clone(),
@@ -135,6 +150,16 @@ pub async fn start_system_audio_capture(
             .await;
         }
 
+        // R6: capture_task_exiting (determine exit reason based on state)
+        let exit_reason = if stop_requested.load(Ordering::Acquire) {
+            "stop_requested"
+        } else if flush_requested.load(Ordering::Acquire) {
+            "flush_requested"
+        } else {
+            "stream_ended"
+        };
+        info!("[speaker] capture_task_exiting mode={} exit_reason={}", task_mode, exit_reason);
+
         let state = app_clone.state::<crate::AudioState>();
         let is_capturing = state.is_capturing.clone();
         {
@@ -147,6 +172,9 @@ pub async fn start_system_audio_capture(
                 *capturing_guard = false;
             };
         }
+
+        // R7: capture_task_exited
+        info!("[speaker] capture_task_exited mode={}", task_mode);
     });
 
     *state_clone
@@ -201,12 +229,18 @@ fn emit_vad_segment(
         forced_flush,
     ) {
         if let Ok(b64) = samples_to_wav_b64(sr, &segment) {
+            // R9: vad_segment_emitted
+            info!("[speaker] vad_segment_emitted forced_flush={} speech_chunks={} segment_samples={}", forced_flush, speech_chunks, segment.len());
             let _ = app.emit("speech-detected", b64);
         } else {
+            // R10: vad_segment_discarded (encode failed)
+            info!("[speaker] vad_segment_discarded reason=\"encode_failed\"");
             error!("Failed to encode speech to WAV");
             let _ = app.emit("audio-encoding-error", "Failed to encode speech");
         }
     } else {
+        // R10: vad_segment_discarded (too short)
+        info!("[speaker] vad_segment_discarded reason=\"too_short\"");
         let _ = app.emit(
             "speech-discarded",
             "Audio too short (likely background noise)",
@@ -253,6 +287,9 @@ async fn run_vad_capture(
         }
 
         if flush_requested.swap(false, Ordering::AcqRel) {
+            // R8: vad_segment_emit_requested
+            info!("[speaker] vad_segment_emit_requested forced_flush=true speech_chunks={} buffer_samples={}", speech_chunks, speech_buffer.len());
+
             emit_vad_segment(
                 &app,
                 &speech_buffer,
@@ -432,15 +469,19 @@ async fn run_continuous_capture(
     let was_hard_stop = stop_requested.load(Ordering::Acquire);
     flush_requested.store(false, Ordering::Release);
 
-    if !audio_buffer.is_empty() && !was_hard_stop {
-        // let duration = start_time.elapsed().as_secs_f32();
+    // R11: continuous_capture_break
+    let elapsed_ms = start_time.elapsed().as_millis();
+    info!("[speaker] continuous_capture_break was_hard_stop={} buffer_samples={} elapsed_ms={}", was_hard_stop, audio_buffer.len(), elapsed_ms);
 
+    if !audio_buffer.is_empty() && !was_hard_stop {
         // Apply noise gate
         let cleaned_audio = apply_noise_gate(&audio_buffer, config.noise_gate_threshold);
         let cleaned_audio = normalize_audio_level(&cleaned_audio, 0.1);
 
         match samples_to_wav_b64(sr, &cleaned_audio) {
             Ok(b64) => {
+                // R12: continuous_audio_emitted
+                info!("[speaker] continuous_audio_emitted buffer_samples={}", audio_buffer.len());
                 let _ = app.emit("speech-detected", b64);
             }
             Err(e) => {
@@ -448,7 +489,10 @@ async fn run_continuous_capture(
                 let _ = app.emit("audio-encoding-error", e);
             }
         }
-    } else if !was_hard_stop {
+    } else if was_hard_stop {
+        // R13: continuous_audio_skipped_hard_stop
+        info!("[speaker] continuous_audio_skipped_hard_stop");
+    } else {
         warn!("No audio captured in continuous mode");
         let _ = app.emit("audio-encoding-error", "No audio recorded");
     }
@@ -561,6 +605,10 @@ pub async fn stop_system_audio_capture(app: AppHandle) -> Result<(), String> {
     state.flush_requested.store(false, Ordering::Release);
     state.stop_requested.store(true, Ordering::Release);
 
+    // R3: capture_command_stop
+    let task_exists = state.stream_task.lock().map(|g| g.is_some()).unwrap_or(false);
+    info!("[speaker] capture_command_stop task_exists={}", task_exists);
+
     let maybe_task = {
         let mut guard = state
             .stream_task
@@ -591,6 +639,10 @@ pub async fn stop_system_audio_capture(app: AppHandle) -> Result<(), String> {
 pub async fn flush_system_audio_capture(app: AppHandle) -> Result<(), String> {
     let state = app.state::<crate::AudioState>();
     state.flush_requested.store(true, Ordering::Release);
+
+    // R4: capture_command_flush
+    info!("[speaker] capture_command_flush");
+
     Ok(())
 }
 

@@ -7,7 +7,7 @@ use std::sync::{mpsc, Arc, Mutex};
 use std::task::{Poll, Waker};
 use std::thread;
 use std::time::Duration;
-use tracing::error;
+use tracing::{error, info};
 use wasapi::{get_default_device, DeviceCollection, Direction, SampleType, StreamMode, WaveFormat};
 
 pub fn get_input_devices() -> Result<Vec<AudioDevice>> {
@@ -241,6 +241,8 @@ impl SpeakerStream {
                     {
                         let state = waker_state.lock().unwrap();
                         if state.shutdown {
+                            // R14: windows_capture_loop_break_shutdown
+                            info!("[speaker] windows_capture_loop_break_shutdown");
                             break;
                         }
                     }
