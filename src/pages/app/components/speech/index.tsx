@@ -23,11 +23,11 @@ import { SettingsPanel } from "./SettingsPanel";
 import { PermissionFlow } from "./PermissionFlow";
 import { QuickActions } from "./QuickActions";
 import { Warning } from "./Warning";
-import { useSystemAudioType } from "@/hooks";
+import { UseSystemAudioReturnType } from "@/hooks";
 import { useApp } from "@/contexts";
 import { cn } from "@/lib/utils";
 
-export const SystemAudio = (props: useSystemAudioType) => {
+export const SystemAudio = (props: UseSystemAudioReturnType) => {
   const {
     capturing,
     isProcessing,

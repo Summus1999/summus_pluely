@@ -6,7 +6,7 @@ import {
 } from "@/lib";
 import { ChatConversation } from "@/types/completion";
 
-export type UseHistoryType = ReturnType<typeof useHistory>;
+export type UseHistoryReturnType = ReturnType<typeof useHistory>;
 
 export interface UseHistoryReturn {
   // State

@@ -1,27 +1,8 @@
 // Completion-related types
-export interface AttachedFile {
-  id: string;
-  name: string;
-  type: string;
-  base64: string;
-  size: number;
-}
+import type { AttachedFile, ChatMessage, ChatConversation } from "./message";
 
-export interface ChatMessage {
-  id: string;
-  role: "user" | "assistant" | "system";
-  content: string;
-  timestamp: number;
-  attachedFiles?: AttachedFile[];
-}
-
-export interface ChatConversation {
-  id: string;
-  title: string;
-  messages: ChatMessage[];
-  createdAt: number;
-  updatedAt: number;
-}
+// Re-export base types
+export type { AttachedFile, ChatMessage, ChatConversation };
 
 export interface CompletionState {
   input: string;

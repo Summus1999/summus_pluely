@@ -4,6 +4,7 @@ import { listen } from "@tauri-apps/api/event";
 import { safeLocalStorage, migrateLocalStorageToSQLite } from "@/lib";
 import { getShortcutsConfig } from "@/lib/storage";
 import { invoke } from "@tauri-apps/api/core";
+import type { ChatConversation } from "@/types";
 
 export const useApp = () => {
   const systemAudio = useSystemAudio();
@@ -58,7 +59,7 @@ export const useApp = () => {
     runMigration();
   }, []);
 
-  const handleSelectConversation = (conversation: any) => {
+  const handleSelectConversation = (conversation: ChatConversation) => {
     // useCompletion will fetch the full conversation from SQLite by id
     window.dispatchEvent(
       new CustomEvent("conversationSelected", {

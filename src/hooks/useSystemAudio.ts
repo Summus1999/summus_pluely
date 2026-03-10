@@ -18,6 +18,7 @@ import {
   generateMessageId,
 } from "@/lib";
 import { Message } from "@/types/completion";
+import type { ChatConversation } from "@/types";
 
 // VAD Configuration interface matching Rust
 export interface VadConfig {
@@ -45,24 +46,7 @@ const DEFAULT_VAD_CONFIG: VadConfig = {
   max_recording_duration_secs: 180, // 3 minutes default
 };
 
-// Chat message interface (reusing from useCompletion)
-interface ChatMessage {
-  id: string;
-  role: "user" | "assistant" | "system";
-  content: string;
-  timestamp: number;
-}
-
-// Conversation interface (reusing from useCompletion)
-export interface ChatConversation {
-  id: string;
-  title: string;
-  messages: ChatMessage[];
-  createdAt: number;
-  updatedAt: number;
-}
-
-export type useSystemAudioType = ReturnType<typeof useSystemAudio>;
+export type UseSystemAudioReturnType = ReturnType<typeof useSystemAudio>;
 
 export function useSystemAudio() {
   const { resizeWindow } = useWindowResize();

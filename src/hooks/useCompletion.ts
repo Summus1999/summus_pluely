@@ -16,31 +16,9 @@ import {
 } from "@/lib";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import type { AttachedFile, ChatMessage, ChatConversation } from "@/types";
 
-// Types for completion
-interface AttachedFile {
-  id: string;
-  name: string;
-  type: string;
-  base64: string;
-  size: number;
-}
-
-interface ChatMessage {
-  id: string;
-  role: "user" | "assistant" | "system";
-  content: string;
-  timestamp: number;
-}
-
-interface ChatConversation {
-  id: string;
-  title: string;
-  messages: ChatMessage[];
-  createdAt: number;
-  updatedAt: number;
-}
-
+// Hook-specific types
 interface CompletionState {
   input: string;
   response: string;
@@ -438,10 +416,8 @@ export const useCompletion = () => {
   // Listen for conversation events from the main ChatHistory component
   useEffect(() => {
     const handleConversationSelected = async (event: any) => {
-      console.log(event, "event");
       // Only the conversation ID is passed through the event
       const { id } = event.detail;
-      console.log(id, "id");
       if (!id || typeof id !== "string") {
         console.error("No conversation ID provided");
         setState((prev) => ({
@@ -450,7 +426,6 @@ export const useCompletion = () => {
         }));
         return;
       }
-      console.log(id, "id");
       try {
         // Fetch the full conversation from SQLite
         const conversation = await getConversationById(id);
@@ -523,7 +498,6 @@ export const useCompletion = () => {
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const MAX_FILES = 6;
 
     files.forEach((file) => {
       if (
