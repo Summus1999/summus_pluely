@@ -7,3 +7,4 @@ export * from "./completion";
 export * from "./system-prompts";
 export * from "./shortcuts";
 export * from "./message";
+export * from "./theme";

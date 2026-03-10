@@ -28,6 +28,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -55,7 +56,7 @@ const validateAndProcessSttProviders = (providersJson: string): TYPE_PROVIDER[] 
         return provider;
       });
   } catch (error) {
-    console.warn("Failed to parse custom STT providers", error);
+    console.warn("[app:context] Failed to parse custom STT providers:", error);
     return [];
   }
 };
@@ -142,7 +143,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setHasActiveLicense(true);
 
     // Check if the auto configs are enabled
-    const autoConfigsEnabled = localStorage.getItem("auto-configs-enabled");
+    const autoConfigsEnabled = localStorage.getItem(STORAGE_KEYS.AUTO_CONFIGS_ENABLED);
     if (!autoConfigsEnabled) {
       // Set default screenshot config for interview scenario
       setScreenshotConfiguration({
@@ -151,7 +152,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         enabled: false, // Default to selection mode for better control
       });
       // Set the flag to true so that we don't change the mode again
-      localStorage.setItem("auto-configs-enabled", "true");
+      localStorage.setItem(STORAGE_KEYS.AUTO_CONFIGS_ENABLED, "true");
     }
   };
 
@@ -165,7 +166,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         const config = getShortcutsConfig();
         await invoke("update_shortcuts", { config });
       } catch (error) {
-        console.error("Failed to synchronize license state:", error);
+        console.error("[app:context] Failed to synchronize license state:", error);
       }
     };
 
@@ -199,7 +200,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           });
         }
       } catch {
-        console.warn("Failed to parse screenshot configuration");
+        console.warn("[app:context] Failed to parse screenshot configuration");
       }
     }
 
@@ -279,7 +280,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           updateCursor(customizableState.cursor.type || "invisible");
         }
       } catch (error) {
-        console.debug("Failed to check customizable state schema:", error);
+        console.debug("[app:context] Failed to check customizable state schema:", error);
       }
     }
 
@@ -294,7 +295,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           setSelectedAudioDevices(parsed);
         }
       } catch {
-        console.warn("Failed to parse selected audio devices");
+        console.warn("[app:context] Failed to parse selected audio devices");
       }
     }
   };
@@ -339,7 +340,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         }>("secure_storage_get");
         await trackAppStart(appVersion, storage.instance_id || "");
       } catch (error) {
-        console.debug("Failed to track app start:", error);
+        console.debug("[app:context] Failed to track app start:", error);
       }
     };
     // Load data
@@ -360,7 +361,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           }),
         ]);
       } catch (error) {
-        console.error("Failed to apply customizable settings:", error);
+        console.error("[app:context] Failed to apply customizable settings:", error);
       }
     };
 
@@ -388,7 +389,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           safeLocalStorage.setItem(STORAGE_KEYS.AUTOSTART_INITIALIZED, "true");
         }
       } catch (error) {
-        console.debug("Autostart initialization skipped:", error);
+        console.debug("[app:context] Autostart initialization skipped:", error);
       }
     };
 
@@ -401,7 +402,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       try {
         await invoke("set_app_icon_visibility", { visible: isVisible });
       } catch (error) {
-        console.error("Failed to set app icon visibility:", error);
+        console.error("[app:context] Failed to set app icon visibility:", error);
       }
     };
 
@@ -552,7 +553,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       await invoke("set_app_icon_visibility", { visible: isVisible });
       loadData();
     } catch (error) {
-      console.error("Failed to toggle app icon visibility:", error);
+      console.error("[app:context] Failed to toggle app icon visibility:", error);
     }
   };
 
@@ -563,7 +564,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       await invoke("set_always_on_top", { enabled: isEnabled });
       loadData();
     } catch (error) {
-      console.error("Failed to toggle always on top:", error);
+      console.error("[app:context] Failed to toggle always on top:", error);
     }
   };
 
@@ -578,7 +579,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       }
       loadData();
     } catch (error) {
-      console.error("Failed to toggle autostart:", error);
+      console.error("[app:context] Failed to toggle autostart:", error);
       const revertedState = updateAutostart(!isEnabled);
       setCustomizable(revertedState);
     }
@@ -596,35 +597,48 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     // no-op
   };
 
-  // Create the context value (extend IContextType accordingly)
-  const value: IContextType = {
-    systemPrompt,
-    setSystemPrompt,
-    allAiProviders,
-    selectedAIProvider,
-    onSetSelectedAIProvider,
-    allSttProviders,
-    customSttProviders,
-    selectedSttProvider,
-    onSetSelectedSttProvider,
-    screenshotConfiguration,
-    setScreenshotConfiguration,
-    customizable,
-    toggleAppIconVisibility,
-    toggleAlwaysOnTop,
-    toggleAutostart,
-    loadData,
-    pluelyApiEnabled,
-    setPluelyApiEnabled,
-    hasActiveLicense,
-    setHasActiveLicense,
-    getActiveLicenseStatus,
-    selectedAudioDevices,
-    setSelectedAudioDevices,
-    setCursorType,
-    supportsImages,
-    setSupportsImages,
-  };
+  // Create the context value with useMemo to prevent unnecessary re-renders
+  const value = useMemo<IContextType>(
+    () => ({
+      systemPrompt,
+      setSystemPrompt,
+      allAiProviders,
+      selectedAIProvider,
+      onSetSelectedAIProvider,
+      allSttProviders,
+      customSttProviders,
+      selectedSttProvider,
+      onSetSelectedSttProvider,
+      screenshotConfiguration,
+      setScreenshotConfiguration,
+      customizable,
+      toggleAppIconVisibility,
+      toggleAlwaysOnTop,
+      toggleAutostart,
+      loadData,
+      pluelyApiEnabled,
+      setPluelyApiEnabled,
+      hasActiveLicense,
+      setHasActiveLicense,
+      getActiveLicenseStatus,
+      selectedAudioDevices,
+      setSelectedAudioDevices,
+      setCursorType,
+      supportsImages,
+      setSupportsImages,
+    }),
+    [
+      systemPrompt,
+      selectedAIProvider,
+      customSttProviders,
+      selectedSttProvider,
+      screenshotConfiguration,
+      customizable,
+      hasActiveLicense,
+      supportsImages,
+      selectedAudioDevices,
+    ]
+  );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

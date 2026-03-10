@@ -14,6 +14,7 @@ export const STORAGE_KEYS = {
   PLUELY_API_ENABLED: "pluely_api_enabled",
   SHORTCUTS: "shortcuts",
   AUTOSTART_INITIALIZED: "autostart_initialized",
+  AUTO_CONFIGS_ENABLED: "auto_configs_enabled",
 
   SELECTED_AUDIO_DEVICES: "selected_audio_devices",
   RESPONSE_SETTINGS: "response_settings",

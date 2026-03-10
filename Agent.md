@@ -92,6 +92,7 @@ Types → Config → Lib → Hooks → Components → Pages
 ```
 
 **禁止反向依赖**：
+
 - `lib/` 不能导入 `hooks/`
 - `config/` 不能导入 `lib/`
 - `hooks/` 不能导入 `pages/`
@@ -108,11 +109,13 @@ Types → Config → Lib → Hooks → Components → Pages
 ### 4.3 日志规范
 
 **前端日志**：
+
 - 使用 `console.info` / `console.warn` / `console.error`
 - 统一前缀：`[system-audio]`, `[completion]`, `[settings]` 等
 - 字段：`sessionId`, `action`, `result`, `reason`, `elapsedMs`
 
 **后端日志**：
+
 - 使用 `tracing::info!` / `tracing::warn!` / `tracing::error!`
 - 统一前缀：`[speaker]`, `[shortcuts]`, `[api]` 等
 
@@ -143,9 +146,11 @@ cd src-tauri && cargo check
 ### 5.2 第二层：单元测试
 
 项目中已有的测试：
+
 - `src-tauri/src/speaker/commands.rs` 中的 VAD 测试
 
 运行命令：
+
 ```bash
 cd src-tauri && cargo test
 ```
@@ -153,11 +158,13 @@ cd src-tauri && cargo test
 ### 5.3 第三层：端到端验证
 
 **本地无构建环境时的方案**：
+
 - Agent 完成修改并确保编译通过后提交代码
 - 人类工程师在本地进行端到端测试
 - 发现的问题在下次会话中修复
 
 **测试清单**（人类工程师验证用）：
+
 - [ ] 应用能正常启动
 - [ ] 系统音频捕获功能正常（VAD 模式）
 - [ ] 系统音频捕获功能正常（连续模式）
@@ -169,6 +176,7 @@ cd src-tauri && cargo test
 ### 5.4 第四层：CI Pipeline
 
 GitHub Actions 工作流：
+
 - `.github/workflows/ci.yml` - PR 时触发
 - `.github/workflows/publish.yml` - 发布时触发
 
@@ -183,6 +191,7 @@ GitHub Actions 工作流：
 当前活跃任务记录在：`docs/plans/`
 
 格式：
+
 ```markdown
 # Feature X Implementation Checklist
 
@@ -227,6 +236,7 @@ GitHub Actions 工作流：
 **现象**：部分功能完成就声称任务完成。
 
 **对策**：
+
 - 严格遵循检查清单
 - 每个检查项必须有明确的完成标准
 - 结束前运行四层反馈闭环
@@ -236,6 +246,7 @@ GitHub Actions 工作流：
 **现象**：Agent 开始答非所问，工作效率下降。
 
 **对策**：
+
 - 上下文利用率保持在 40% 以下
 - 使用 `ReadFile` 只读取需要的代码段
 - 复杂任务分解为多个会话
@@ -245,6 +256,7 @@ GitHub Actions 工作流：
 **现象**：出现循环依赖或跨层调用。
 
 **对策**：
+
 - 提交前检查导入关系
 - 使用 `Grep` 验证依赖方向
 - 违反时立即重构
@@ -254,6 +266,7 @@ GitHub Actions 工作流：
 **现象**：TypeScript 编译失败。
 
 **对策**：
+
 - 每次修改后立即运行 `npx tsc --noEmit`
 - 不依赖隐式类型推断
 - 使用类型守卫处理 `unknown`
@@ -265,12 +278,14 @@ GitHub Actions 工作流：
 #### 陷阱 1：Tauri Invoke 调用未处理错误
 
 **现象**：
+
 ```typescript
 // 错误：未处理可能的异常
 await invoke("start_system_audio_capture", { config });
 ```
 
 **正确做法**：
+
 ```typescript
 // 正确：使用 try-catch 或 .catch()
 try {
@@ -291,6 +306,7 @@ invoke("stop_system_audio_capture").catch(() => {});
 **现象**：内存泄漏，多次注册同一事件监听器。
 
 **错误**：
+
 ```typescript
 useEffect(() => {
   listen("speech-detected", handler); // 没有保存 unlisten
@@ -298,6 +314,7 @@ useEffect(() => {
 ```
 
 **正确做法**：
+
 ```typescript
 useEffect(() => {
   let unlisten: (() => void) | undefined;
@@ -318,6 +335,7 @@ useEffect(() => {
 **现象**：AI 流式响应被中断后，AbortController 未被清理，导致后续请求失败。
 
 **参考实现**（`useSystemAudio.ts` 中的正确模式）：
+
 ```typescript
 const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -340,6 +358,7 @@ finally {
 **现象**：异步操作（STT、AI）完成后，session 已切换，但仍更新旧 session 的状态。
 
 **正确模式**：
+
 ```typescript
 const sessionId = captureSessionIdRef.current;
 
@@ -361,6 +380,7 @@ setState(result);
 **现象**：Tauri 应用在 SSR 或特殊环境下访问 localStorage 报错。
 
 **正确做法**：始终使用 `safeLocalStorage`：
+
 ```typescript
 import { safeLocalStorage } from "@/lib";
 
@@ -383,6 +403,7 @@ try {
 **现象**：前端修改 VAD 参数后，后端行为不一致。
 
 **注意**：
+
 - VAD 配置必须前后端同步修改
 - `DEFAULT_VAD_CONFIG` 在 `useSystemAudio.ts` 和 Rust `commands.rs` 中必须一致
 - 修改配置时调用 `invoke("update_vad_config", { config })`
@@ -392,6 +413,7 @@ try {
 **现象**：在 Rust 代码中使用 `println!` 或使用错误的日志级别。
 
 **规范**：
+
 ```rust
 // 正确
 use tracing::{info, warn, error};
@@ -409,6 +431,7 @@ println!("debug message");  // 禁止使用
 **现象**：同一个文件中使用 `error` 和 `err` 混用。
 
 **规范**：统一使用 `error`：
+
 ```typescript
 // 正确
 try {
@@ -428,6 +451,7 @@ try {
 **现象**：自定义 Provider 的 curl 模板变量未正确替换。
 
 **注意**：
+
 - 变量格式：`{{VARIABLE_NAME}}`
 - 图片输入必须有 `{{IMAGE}}` 占位符
 - STT 必须有 `{{AUDIO}}` 占位符
@@ -436,10 +460,12 @@ try {
 #### 陷阱 10：连续模式与 VAD 模式混淆
 
 **现象**：
+
 - `config.enabled = true` → VAD 模式（自动检测语音）
 - `config.enabled = false` → 连续/手动模式（手动开始/停止）
 
 **检查点**：
+
 - `isContinuousMode = !config.enabled`
 - 连续模式需要手动调用 `startContinuousRecording()`
 - VAD 模式自动开始录音，检测到语音后自动处理
@@ -471,6 +497,7 @@ try {
 ### 人类审查点
 
 以下情况需要人类工程师确认：
+
 - 架构设计变更
 - 新增外部依赖
 - 修改现有 API 接口
@@ -483,6 +510,7 @@ try {
 ### 9.1 Tauri 命令调用
 
 前端调用 Rust 命令：
+
 ```typescript
 import { invoke } from "@tauri-apps/api/core";
 
