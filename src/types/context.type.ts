@@ -6,7 +6,6 @@ export type IContextType = {
   systemPrompt: string;
   setSystemPrompt: Dispatch<SetStateAction<string>>;
   allAiProviders: TYPE_PROVIDER[];
-  customAiProviders: TYPE_PROVIDER[];
   selectedAIProvider: {
     provider: string;
     variables: Record<string, string>;

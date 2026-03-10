@@ -478,8 +478,8 @@ export const PluelyApiSetup = () => {
             storedLicenseKey
               ? pluelyApiEnabled
                 ? "正在使用 Pluely API 进行音频和聊天服务。"
-                : "正在使用你自己的 AI 服务商进行音频和聊天服务。"
-              : "需要有效的许可证才能启用 Pluely API，你也可以使用自己的 AI 服务商和 STT 服务商。"
+                : "当前使用设置页中配置的 AI 与 STT 服务商。"
+              : "需要有效的许可证才能启用 Pluely API；未启用时你仍可使用内置 AI/STT 配置，并在设置页添加自定义 STT 服务商。"
           }
         />
         <Switch

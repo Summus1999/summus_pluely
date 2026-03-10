@@ -1,6 +1,5 @@
 import {
   Settings,
-  Code,
   MessagesSquare,
   WandSparkles,
   AudioLinesIcon,
@@ -62,11 +61,6 @@ export const useMenuItems = () => {
       icon: SquareSlashIcon,
       label: "光标与快捷键",
       href: "/shortcuts",
-    },
-    {
-      icon: Code,
-      label: "开发空间",
-      href: "/dev-space",
     },
   ];
 

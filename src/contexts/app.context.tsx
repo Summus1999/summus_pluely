@@ -31,10 +31,7 @@ import {
   useState,
 } from "react";
 
-const validateAndProcessCurlProviders = (
-  providersJson: string,
-  providerType: "AI" | "STT"
-): TYPE_PROVIDER[] => {
+const validateAndProcessSttProviders = (providersJson: string): TYPE_PROVIDER[] => {
   try {
     const parsed = JSON.parse(providersJson);
     if (!Array.isArray(parsed)) {
@@ -46,21 +43,19 @@ const validateAndProcessCurlProviders = (
         try {
           curl2Json(p.curl);
           return true;
-        } catch (e) {
+        } catch {
           return false;
         }
-
-        return true;
       })
       .map((p) => {
         const provider = { ...p, isCustom: true };
-        if (providerType === "STT" && provider.curl) {
+        if (provider.curl) {
           provider.curl = provider.curl.replace(/AUDIO_BASE64/g, "AUDIO");
         }
         return provider;
       });
-  } catch (e) {
-    console.warn(`Failed to parse custom ${providerType} providers`, e);
+  } catch (error) {
+    console.warn("Failed to parse custom STT providers", error);
     return [];
   }
 };
@@ -96,10 +91,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
   });
 
-  // AI Providers
-  const [customAiProviders, setCustomAiProviders] = useState<TYPE_PROVIDER[]>(
-    []
-  );
   const [selectedAIProvider, setSelectedAIProvider] = useState<{
     provider: string;
     variables: Record<string, string>;
@@ -143,7 +134,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     safeLocalStorage.setItem(STORAGE_KEYS.SUPPORTS_IMAGES, String(value));
   };
 
-  // Pluely API 已禁用 - 中国化版本直接使用自定义 Provider
+  // Pluely API is disabled in this build.
   const pluelyApiEnabled = false;
 
   const getActiveLicenseStatus = async () => {
@@ -211,21 +202,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       }
     }
 
-    // Load custom AI providers
-    const savedAi = safeLocalStorage.getItem(STORAGE_KEYS.CUSTOM_AI_PROVIDERS);
-    let aiList: TYPE_PROVIDER[] = [];
-    if (savedAi) {
-      aiList = validateAndProcessCurlProviders(savedAi, "AI");
-    }
-    setCustomAiProviders(aiList);
-
     // Load custom STT providers
     const savedStt = safeLocalStorage.getItem(
       STORAGE_KEYS.CUSTOM_SPEECH_PROVIDERS
     );
     let sttList: TYPE_PROVIDER[] = [];
     if (savedStt) {
-      sttList = validateAndProcessCurlProviders(savedStt, "STT");
+      sttList = validateAndProcessSttProviders(savedStt);
     }
     setCustomSttProviders(sttList);
 
@@ -234,7 +217,22 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       STORAGE_KEYS.SELECTED_AI_PROVIDER
     );
     if (savedSelectedAi) {
-      setSelectedAIProvider(JSON.parse(savedSelectedAi));
+      try {
+        const parsed = JSON.parse(savedSelectedAi);
+        const isValidProvider = AI_PROVIDERS.some(
+          (provider) => provider.id === parsed?.provider
+        );
+
+        if (isValidProvider) {
+          setSelectedAIProvider(parsed);
+        } else {
+          safeLocalStorage.removeItem(STORAGE_KEYS.SELECTED_AI_PROVIDER);
+          setSelectedAIProvider({ provider: "", variables: {} });
+        }
+      } catch {
+        safeLocalStorage.removeItem(STORAGE_KEYS.SELECTED_AI_PROVIDER);
+        setSelectedAIProvider({ provider: "", variables: {} });
+      }
     }
 
     // Load selected STT provider
@@ -242,7 +240,22 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       STORAGE_KEYS.SELECTED_STT_PROVIDER
     );
     if (savedSelectedStt) {
-      setSelectedSttProvider(JSON.parse(savedSelectedStt));
+      try {
+        const parsed = JSON.parse(savedSelectedStt);
+        const isValidProvider = [...SPEECH_TO_TEXT_PROVIDERS, ...sttList].some(
+          (provider) => provider.id === parsed?.provider
+        );
+
+        if (isValidProvider) {
+          setSelectedSttProvider(parsed);
+        } else {
+          safeLocalStorage.removeItem(STORAGE_KEYS.SELECTED_STT_PROVIDER);
+          setSelectedSttProvider({ provider: "", variables: {} });
+        }
+      } catch {
+        safeLocalStorage.removeItem(STORAGE_KEYS.SELECTED_STT_PROVIDER);
+        setSelectedSttProvider({ provider: "", variables: {} });
+      }
     }
 
     // Load customizable state
@@ -419,7 +432,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (
-        e.key === STORAGE_KEYS.CUSTOM_AI_PROVIDERS ||
         e.key === STORAGE_KEYS.SELECTED_AI_PROVIDER ||
         e.key === STORAGE_KEYS.CUSTOM_SPEECH_PROVIDERS ||
         e.key === STORAGE_KEYS.SELECTED_STT_PROVIDER ||
@@ -437,7 +449,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   // Check if the current AI provider/model supports images
   useEffect(() => {
-    // For custom AI providers, check if curl contains {{IMAGE}}
     const provider = allAiProviders.find(
       (p) => p.id === selectedAIProvider.provider
     );
@@ -470,10 +481,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   }, [selectedSttProvider]);
 
   // Computed all AI providers
-  const allAiProviders: TYPE_PROVIDER[] = [
-    ...AI_PROVIDERS,
-    ...customAiProviders,
-  ];
+  const allAiProviders: TYPE_PROVIDER[] = AI_PROVIDERS;
 
   // Computed all STT providers
   const allSttProviders: TYPE_PROVIDER[] = [
@@ -573,7 +581,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     loadData();
   };
 
-  // Pluely API 已禁用，此函数为空操作
+  // Pluely API is disabled in this build.
   const setPluelyApiEnabled = async (_enabled: boolean) => {
     // no-op
   };
@@ -583,7 +591,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     systemPrompt,
     setSystemPrompt,
     allAiProviders,
-    customAiProviders,
     selectedAIProvider,
     onSetSelectedAIProvider,
     allSttProviders,

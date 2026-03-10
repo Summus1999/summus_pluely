@@ -17,7 +17,7 @@ export const Selection = ({
 }: {
   selected?: string;
   onChange: (value: any) => void;
-  options: { label: string; value: string; isCustom?: boolean }[] | [];
+  options: { label: string; value: string }[] | [];
   placeholder?: string;
   isLoading?: boolean;
   disabled?: boolean;
@@ -40,27 +40,7 @@ export const Selection = ({
         )}
       </SelectTrigger>
       <SelectContent>
-        {options?.filter((provider) => provider.isCustom).length > 0 && (
-          <div className="border-b border-input/50 pb-2">
-            <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
-              自定义 AI 服务商
-            </div>
-            {options
-              ?.filter((provider) => provider.isCustom)
-              .map((provider) => (
-                <SelectItem
-                  key={provider.value}
-                  value={provider.value}
-                  className="cursor-pointer hover:bg-accent/50"
-                >
-                  <span className="font-medium">{provider.label}</span>
-                </SelectItem>
-              ))}
-          </div>
-        )}
-        {options
-          ?.filter((provider) => !provider.isCustom)
-          .map((provider) => (
+        {options.map((provider) => (
             <SelectItem
               key={provider.value}
               value={provider.value}

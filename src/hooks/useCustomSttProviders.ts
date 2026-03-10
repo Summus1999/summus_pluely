@@ -12,15 +12,16 @@ import {
 
 export function useCustomSttProviders() {
   const { loadData } = useApp();
-  const [showForm, setShowForm] = useState(false);
-  const [editingProvider, setEditingProvider] = useState<string | null>(null);
-  const [formData, setFormData] = useState<TYPE_PROVIDER>({
+  const getInitialFormData = (): TYPE_PROVIDER => ({
     id: "",
     streaming: false,
     responseContentPath: "",
     isCustom: true,
     curl: "",
   });
+  const [showForm, setShowForm] = useState(false);
+  const [editingProvider, setEditingProvider] = useState<string | null>(null);
+  const [formData, setFormData] = useState<TYPE_PROVIDER>(getInitialFormData());
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -34,7 +35,7 @@ export function useCustomSttProviders() {
       ...provider,
     });
     setEditingProvider(providerId);
-    setShowForm(!showForm);
+    setShowForm(true);
     setErrors({});
   };
 
@@ -61,10 +62,10 @@ export function useCustomSttProviders() {
       const success = removeCustomSttProvider(deleteConfirm);
       if (success) {
         setDeleteConfirm(null);
-        loadData(); // Refresh data
+        loadData();
       }
     } catch (error) {
-      console.error("Error deleting custom provider:", error);
+      console.error("Failed to delete custom STT provider:", error);
     }
   };
 
@@ -77,12 +78,12 @@ export function useCustomSttProviders() {
     const newErrors: { [key: string]: string } = {};
 
     if (!formData.curl.trim()) {
-      newErrors.curl = "Curl command is required";
+      newErrors.curl = "请输入 cURL 命令。";
     } else {
       const hasAudioVar = formData.curl.includes("{{AUDIO}}");
 
       if (!hasAudioVar) {
-        newErrors.curl = "cURL command must contain {{AUDIO}}.";
+        newErrors.curl = "cURL 命令必须包含 {{AUDIO}}。";
       } else {
         const validation = validateCurl(formData.curl, []);
         if (!validation.isValid) {
@@ -92,7 +93,7 @@ export function useCustomSttProviders() {
     }
 
     if (!formData.responseContentPath?.trim()) {
-      newErrors.responseContentPath = "Response content path is required";
+      newErrors.responseContentPath = "请输入响应内容路径。";
     }
 
     setErrors(newErrors);
@@ -103,48 +104,34 @@ export function useCustomSttProviders() {
 
     try {
       if (editingProvider) {
-        // Update existing provider
         const success = updateCustomSttProvider(editingProvider, {
           curl: formData.curl,
-          streaming: false, // Streaming is not supported for STT providers. it will be fixed in the future.
+          streaming: false,
           responseContentPath: formData.responseContentPath,
         });
 
         if (success) {
           setEditingProvider(null);
           setShowForm(false);
-          setFormData({
-            id: "",
-            streaming: false,
-            responseContentPath: "",
-            isCustom: true,
-            curl: "",
-          });
-          loadData(); // Refresh data
+          setFormData(getInitialFormData());
+          loadData();
         }
       } else {
-        // Create new provider
         const newProvider = {
           curl: formData.curl,
-          streaming: false, // Streaming is not supported for STT providers. it will be fixed in the future.
+          streaming: false,
           responseContentPath: formData.responseContentPath,
         };
 
         const saved = addCustomSttProvider(newProvider);
         if (saved) {
           setShowForm(false);
-          setFormData({
-            id: "",
-            streaming: false,
-            responseContentPath: "",
-            isCustom: true,
-            curl: "",
-          });
-          loadData(); // Refresh data
+          setFormData(getInitialFormData());
+          loadData();
         }
       }
     } catch (error) {
-      console.error("Error saving custom provider:", error);
+      console.error("Failed to save custom STT provider:", error);
     }
   };
 
