@@ -1,0 +1,73 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-10",
+  "activeFeatures": [
+    {
+      "id": "system-audio-logging",
+      "name": "System Audio Logging Implementation",
+      "status": "completed",
+      "priority": "high",
+      "startedAt": "2026-03-10",
+      "completedAt": "2026-03-10",
+      "description": "为系统音频捕获功能添加前后端日志，便于调试和监控",
+      "filesModified": [
+        "src/hooks/useSystemAudio.ts",
+        "src-tauri/src/speaker/commands.rs",
+        "src-tauri/src/speaker/windows.rs"
+      ],
+      "verificationStatus": "pending-human-test"
+    },
+    {
+      "id": "harness-engineering-setup",
+      "name": "Harness Engineering Framework Setup",
+      "status": "in_progress",
+      "priority": "high",
+      "startedAt": "2026-03-10",
+      "description": "建立 Harness Engineering 框架，包括 Agent.md 文档和进度追踪机制",
+      "filesModified": [
+        "Agent.md",
+        "docs/active-features.json"
+      ],
+      "subTasks": [
+        {
+          "id": "agent-md",
+          "name": "Create and populate Agent.md",
+          "status": "completed",
+          "completedAt": "2026-03-10"
+        },
+        {
+          "id": "progress-tracking",
+          "name": "Setup progress tracking system",
+          "status": "completed",
+          "completedAt": "2026-03-10"
+        },
+        {
+          "id": "decision-records",
+          "name": "Create decision records structure",
+          "status": "completed",
+          "completedAt": "2026-03-10"
+        }
+      ]
+    }
+  ],
+  "backlog": [
+    {
+      "id": "ai-provider-expansion",
+      "name": "Expand AI Provider Support",
+      "status": "backlog",
+      "priority": "medium",
+      "description": "添加更多国内 AI 服务商支持"
+    },
+    {
+      "id": "ui-performance-optimization",
+      "name": "UI Performance Optimization",
+      "status": "backlog",
+      "priority": "low",
+      "description": "优化大消息列表的渲染性能"
+    }
+  ],
+  "metadata": {
+    "schemaVersion": "1.0",
+    "updateInstructions": "当开始新功能时添加到此文件，完成后更新 status 和 completedAt"
+  }
+}
