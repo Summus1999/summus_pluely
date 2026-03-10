@@ -1,9 +1,27 @@
 import { Button, Card, DragButton } from "@/components";
 import { RefreshCcwIcon, SparklesIcon } from "lucide-react";
 
-export const ErrorLayout = ({ isCompact }: { isCompact?: boolean }) => {
+interface ErrorLayoutProps {
+  /** 是否使用紧凑模式 */
+  isCompact?: boolean;
+}
+
+/**
+ * ErrorLayout - 错误页面布局组件
+ *
+ * 显示应用错误状态，提供重新加载功能
+ * 支持紧凑模式（用于 Error Boundary）和完整模式两种展示形式
+ *
+ * @example
+ * // 紧凑模式（用于 Error Boundary）
+ * <ErrorLayout isCompact />
+ *
+ * // 完整模式（用于独立错误页面）
+ * <ErrorLayout />
+ */
+export const ErrorLayout = ({ isCompact }: ErrorLayoutProps) => {
   return isCompact ? (
-    <Card className="flex flex-row w-screen h-screen items-center justify-between p-4">
+    <Card role="alert" className="flex flex-row w-screen h-screen items-center justify-between p-4">
       <div className="flex size-8 items-center justify-center rounded-xl bg-foreground">
         <SparklesIcon className="size-5 text-background" />
       </div>
@@ -19,7 +37,7 @@ export const ErrorLayout = ({ isCompact }: { isCompact?: boolean }) => {
       </div>
     </Card>
   ) : (
-    <div className="relative flex flex-col h-screen w-screen justify-center items-center overflow-hidden bg-background">
+    <div role="alert" aria-live="assertive" className="relative flex flex-col h-screen w-screen justify-center items-center overflow-hidden bg-background">
       <div className="flex flex-col justify-center items-center gap-8 max-w-[600px] px-4 animate-fadeIn">
         <div className="absolute top-1/4 left-0 right-0 flex justify-center items-center transform hover:scale-105 transition-transform duration-200">
           <div className="flex h-16 items-center px-4 pt-10 gap-2">
