@@ -5,8 +5,9 @@ mod capture;
 mod db;
 mod shortcuts;
 mod window;
+use std::sync::atomic::AtomicBool;
 use std::sync::{Arc, Mutex};
-use tauri::{AppHandle, Manager, WebviewWindow};
+use tauri::Manager;
 use tauri_plugin_posthog::{init as posthog_init, PostHogConfig, PostHogOptions};
 use tokio::task::JoinHandle;
 mod speaker;
@@ -17,11 +18,24 @@ use speaker::VadConfig;
 #[allow(deprecated)]
 use tauri_nspanel::{cocoa::appkit::NSWindowCollectionBehavior, panel_delegate, WebviewWindowExt};
 
-#[derive(Default)]
 pub struct AudioState {
     stream_task: Arc<Mutex<Option<JoinHandle<()>>>>,
     vad_config: Arc<Mutex<VadConfig>>,
     is_capturing: Arc<Mutex<bool>>,
+    stop_requested: Arc<AtomicBool>,
+    flush_requested: Arc<AtomicBool>,
+}
+
+impl Default for AudioState {
+    fn default() -> Self {
+        Self {
+            stream_task: Arc::new(Mutex::new(None)),
+            vad_config: Arc::new(Mutex::new(VadConfig::default())),
+            is_capturing: Arc::new(Mutex::new(false)),
+            stop_requested: Arc::new(AtomicBool::new(false)),
+            flush_requested: Arc::new(AtomicBool::new(false)),
+        }
+    }
 }
 
 #[tauri::command]
@@ -33,7 +47,7 @@ fn get_app_version() -> String {
 pub fn run() {
     // Get PostHog API key
     let posthog_api_key = option_env!("POSTHOG_API_KEY").unwrap_or("").to_string();
-    let mut builder = tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(
             tauri_plugin_sql::Builder::default()
                 .add_migrations("sqlite:pluely.db", db::migrations())
@@ -69,7 +83,7 @@ pub fn run() {
     {
         builder = builder.plugin(tauri_nspanel::init());
     }
-    let mut builder = builder
+    let builder = builder
         .invoke_handler(tauri::generate_handler![
             get_app_version,
             window::set_window_height,
@@ -105,6 +119,7 @@ pub fn run() {
             api::get_activity,
             speaker::start_system_audio_capture,
             speaker::stop_system_audio_capture,
+            speaker::flush_system_audio_capture,
             speaker::manual_stop_continuous,
             speaker::check_system_audio_access,
             speaker::request_system_audio_access,

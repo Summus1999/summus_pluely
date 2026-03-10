@@ -59,9 +59,13 @@ export const SystemAudio = (props: useSystemAudioType) => {
     updateVadConfiguration,
     isRecordingInContinuousMode,
     recordingProgress,
+    isStartingCapture,
+    isStoppingCapture,
+    isFlushingCapture,
     manualStopAndSend,
     startContinuousRecording,
     ignoreContinuousRecording,
+    flushCurrentCapture,
     scrollAreaRef,
   } = props;
 
@@ -101,6 +105,8 @@ export const SystemAudio = (props: useSystemAudioType) => {
   }, [isProcessing, screenshotImage]);
 
   const handleToggleCapture = async () => {
+    if (isStartingCapture || isStoppingCapture || isFlushingCapture) return;
+
     if (capturing) {
       await stopCapture();
     } else {
@@ -187,6 +193,7 @@ export const SystemAudio = (props: useSystemAudioType) => {
           size="icon"
           title={getButtonTitle()}
           onClick={handleToggleCapture}
+          disabled={isStartingCapture || isStoppingCapture || isFlushingCapture}
           className={cn(
             capturing && "bg-green-50 hover:bg-green-100",
             error && "bg-red-100 hover:bg-red-200"
@@ -213,6 +220,9 @@ export const SystemAudio = (props: useSystemAudioType) => {
                     isVadMode={isVadMode}
                     onModeChange={handleModeChange}
                     disabled={
+                      isStartingCapture ||
+                      isStoppingCapture ||
+                      isFlushingCapture ||
                       isRecordingInContinuousMode ||
                       isProcessing ||
                       isAIProcessing
@@ -340,10 +350,15 @@ export const SystemAudio = (props: useSystemAudioType) => {
                       isRecording={isRecordingInContinuousMode}
                       isProcessing={isProcessing}
                       isAIProcessing={isAIProcessing}
+                      isTransitioning={
+                        isStartingCapture || isStoppingCapture || isFlushingCapture
+                      }
                       recordingProgress={recordingProgress}
                       maxDuration={vadConfig.max_recording_duration_secs}
                       onStartRecording={startContinuousRecording}
-                      onStopAndSend={manualStopAndSend}
+                      onStopAndSend={
+                        isVadMode ? flushCurrentCapture : manualStopAndSend
+                      }
                       onIgnore={ignoreContinuousRecording}
                     />
 

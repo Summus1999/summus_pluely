@@ -10,7 +10,7 @@ use std::io::Cursor;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use tauri::{AppHandle, Emitter, Listener, Manager};
+use tauri::{AppHandle, Emitter, Manager};
 use tauri_plugin_shell::ShellExt;
 use tracing::{error, warn};
 
@@ -92,11 +92,15 @@ pub async fn start_system_audio_capture(
     }
 
     let app_clone = app.clone();
+    state.stop_requested.store(false, Ordering::Release);
+    state.flush_requested.store(false, Ordering::Release);
     let vad_config = state
         .vad_config
         .lock()
         .map_err(|e| format!("Failed to read VAD config: {}", e))?
         .clone();
+    let stop_requested = state.stop_requested.clone();
+    let flush_requested = state.flush_requested.clone();
 
     // Mark as capturing BEFORE spawning task
     *state
@@ -110,15 +114,37 @@ pub async fn start_system_audio_capture(
     let state_clone = app.state::<crate::AudioState>();
     let task = tokio::spawn(async move {
         if vad_config.enabled {
-            run_vad_capture(app_clone.clone(), stream, sr, vad_config).await;
+            run_vad_capture(
+                app_clone.clone(),
+                stream,
+                sr,
+                vad_config,
+                stop_requested.clone(),
+                flush_requested.clone(),
+            )
+            .await;
         } else {
-            run_continuous_capture(app_clone.clone(), stream, sr, vad_config).await;
+            run_continuous_capture(
+                app_clone.clone(),
+                stream,
+                sr,
+                vad_config,
+                stop_requested.clone(),
+                flush_requested.clone(),
+            )
+            .await;
         }
 
         let state = app_clone.state::<crate::AudioState>();
+        let is_capturing = state.is_capturing.clone();
         {
             if let Ok(mut guard) = state.stream_task.lock() {
                 *guard = None;
+            }
+        }
+        {
+            if let Ok(mut capturing_guard) = is_capturing.lock() {
+                *capturing_guard = false;
             };
         }
     });
@@ -131,12 +157,71 @@ pub async fn start_system_audio_capture(
     Ok(())
 }
 
+fn prepare_vad_segment(
+    speech_buffer: &[f32],
+    speech_chunks: usize,
+    silence_chunks: usize,
+    config: &VadConfig,
+    sr: u32,
+    forced_flush: bool,
+) -> Option<Vec<f32>> {
+    if speech_chunks < config.min_speech_chunks || speech_buffer.is_empty() {
+        return None;
+    }
+
+    let mut finalized = speech_buffer.to_vec();
+    if !forced_flush {
+        let silence_duration_samples = silence_chunks * config.hop_size;
+        let keep_silence_samples = (sr as usize) * 15 / 100;
+        let trim_amount = silence_duration_samples.saturating_sub(keep_silence_samples);
+
+        if finalized.len() > trim_amount {
+            finalized.truncate(finalized.len() - trim_amount);
+        }
+    }
+
+    Some(normalize_audio_level(&finalized, 0.1))
+}
+
+fn emit_vad_segment(
+    app: &AppHandle,
+    speech_buffer: &[f32],
+    speech_chunks: usize,
+    silence_chunks: usize,
+    config: &VadConfig,
+    sr: u32,
+    forced_flush: bool,
+) {
+    if let Some(segment) = prepare_vad_segment(
+        speech_buffer,
+        speech_chunks,
+        silence_chunks,
+        config,
+        sr,
+        forced_flush,
+    ) {
+        if let Ok(b64) = samples_to_wav_b64(sr, &segment) {
+            let _ = app.emit("speech-detected", b64);
+        } else {
+            error!("Failed to encode speech to WAV");
+            let _ = app.emit("audio-encoding-error", "Failed to encode speech");
+        }
+    } else {
+        let _ = app.emit(
+            "speech-discarded",
+            "Audio too short (likely background noise)",
+        );
+    }
+}
+
 // VAD-enabled capture - OPTIMIZED for real-time speech detection
 async fn run_vad_capture(
     app: AppHandle,
     stream: impl StreamExt<Item = f32> + Unpin,
     sr: u32,
     config: VadConfig,
+    stop_requested: Arc<AtomicBool>,
+    flush_requested: Arc<AtomicBool>,
 ) {
     let mut stream = stream;
     let mut buffer: VecDeque<f32> = VecDeque::new();
@@ -148,11 +233,49 @@ async fn run_vad_capture(
     let mut speech_chunks = 0;
     let max_samples = sr as usize * 30; // 30s safety cap per utterance
 
-    while let Some(sample) = stream.next().await {
-        buffer.push_back(sample);
+    loop {
+        if stop_requested.load(Ordering::Acquire) {
+            break;
+        }
+
+        tokio::select! {
+            sample_opt = stream.next() => {
+                match sample_opt {
+                    Some(sample) => buffer.push_back(sample),
+                    None => break,
+                }
+            }
+            _ = tokio::time::sleep(tokio::time::Duration::from_millis(10)) => {}
+        }
+
+        if stop_requested.load(Ordering::Acquire) {
+            break;
+        }
+
+        if flush_requested.swap(false, Ordering::AcqRel) {
+            emit_vad_segment(
+                &app,
+                &speech_buffer,
+                speech_chunks,
+                silence_chunks,
+                &config,
+                sr,
+                true,
+            );
+            speech_buffer.clear();
+            pre_speech.clear();
+            in_speech = false;
+            silence_chunks = 0;
+            speech_chunks = 0;
+            continue;
+        }
 
         // Process in fixed chunks for VAD analysis
         while buffer.len() >= config.hop_size {
+            if stop_requested.load(Ordering::Acquire) {
+                break;
+            }
+
             let mut mono = Vec::with_capacity(config.hop_size);
             for _ in 0..config.hop_size {
                 if let Some(v) = buffer.pop_front() {
@@ -184,13 +307,11 @@ async fn run_vad_capture(
 
                 // Safety cap: force emit if exceeds 30s
                 if speech_buffer.len() > max_samples {
-                    let normalized_buffer = normalize_audio_level(&speech_buffer, 0.1);
-                    if let Ok(b64) = samples_to_wav_b64(sr, &normalized_buffer) {
-                        // let duration = speech_buffer.len() as f32 / sr as f32;
-                        let _ = app.emit("speech-detected", b64);
-                    }
+                    emit_vad_segment(&app, &speech_buffer, speech_chunks, 0, &config, sr, true);
                     speech_buffer.clear();
+                    pre_speech.clear();
                     in_speech = false;
+                    silence_chunks = 0;
                     speech_chunks = 0;
                 }
             } else {
@@ -203,36 +324,19 @@ async fn run_vad_capture(
 
                     // Check if silence duration exceeds threshold
                     if silence_chunks >= config.silence_chunks {
-                        // Verify minimum speech duration
-                        if speech_chunks >= config.min_speech_chunks && !speech_buffer.is_empty() {
-                            // Trim trailing silence (keep ~0.15s for natural ending)
-                            let silence_duration_samples = silence_chunks * config.hop_size;
-                            let keep_silence_samples = (sr as usize) * 15 / 100; // 0.15s
-                            let trim_amount =
-                                silence_duration_samples.saturating_sub(keep_silence_samples);
-
-                            if speech_buffer.len() > trim_amount {
-                                speech_buffer.truncate(speech_buffer.len() - trim_amount);
-                            }
-
-                            // Emit complete speech segment
-                            let normalized_buffer = normalize_audio_level(&speech_buffer, 0.1);
-                            if let Ok(b64) = samples_to_wav_b64(sr, &normalized_buffer) {
-                                // let duration = speech_buffer.len() as f32 / sr as f32;
-                                let _ = app.emit("speech-detected", b64);
-                            } else {
-                                error!("Failed to encode speech to WAV");
-                                let _ = app.emit("audio-encoding-error", "Failed to encode speech");
-                            }
-                        } else {
-                            let _ = app.emit(
-                                "speech-discarded",
-                                "Audio too short (likely background noise)",
-                            );
-                        }
+                        emit_vad_segment(
+                            &app,
+                            &speech_buffer,
+                            speech_chunks,
+                            silence_chunks,
+                            &config,
+                            sr,
+                            false,
+                        );
 
                         // Reset for next speech detection
                         speech_buffer.clear();
+                        pre_speech.clear();
                         in_speech = false;
                         silence_chunks = 0;
                         speech_chunks = 0;
@@ -262,6 +366,8 @@ async fn run_continuous_capture(
     stream: impl StreamExt<Item = f32> + Unpin,
     sr: u32,
     config: VadConfig,
+    stop_requested: Arc<AtomicBool>,
+    flush_requested: Arc<AtomicBool>,
 ) {
     let mut stream = stream;
     let max_samples = (sr as u64 * config.max_recording_duration_secs) as usize;
@@ -270,15 +376,6 @@ async fn run_continuous_capture(
     let mut audio_buffer = Vec::with_capacity(max_samples);
     let start_time = Instant::now();
     let max_duration = Duration::from_secs(config.max_recording_duration_secs);
-
-    // Atomic flag for manual stop
-    let stop_flag = Arc::new(AtomicBool::new(false));
-    let stop_flag_for_listener = stop_flag.clone();
-
-    // Listen for manual stop event
-    let stop_listener = app.listen("manual-stop-continuous", move |_| {
-        stop_flag_for_listener.store(true, Ordering::Release);
-    });
 
     // Emit recording started
     let _ = app.emit(
@@ -289,7 +386,7 @@ async fn run_continuous_capture(
     // Accumulate audio - check stop flag on EVERY sample for immediate response
     loop {
         // Check stop flag FIRST on every iteration for immediate stopping
-        if stop_flag.load(Ordering::Acquire) {
+        if stop_requested.load(Ordering::Acquire) || flush_requested.load(Ordering::Acquire) {
             break;
         }
 
@@ -297,7 +394,7 @@ async fn run_continuous_capture(
             sample_opt = stream.next() => {
                 match sample_opt {
                     Some(sample) => {
-                        if stop_flag.load(Ordering::Acquire) {
+                        if stop_requested.load(Ordering::Acquire) || flush_requested.load(Ordering::Acquire) {
                             break;
                         }
 
@@ -331,11 +428,11 @@ async fn run_continuous_capture(
         }
     }
 
-    // Clean up event listener (CRITICAL)
-    app.unlisten(stop_listener);
-
     // Process and emit audio
-    if !audio_buffer.is_empty() {
+    let was_hard_stop = stop_requested.load(Ordering::Acquire);
+    flush_requested.store(false, Ordering::Release);
+
+    if !audio_buffer.is_empty() && !was_hard_stop {
         // let duration = start_time.elapsed().as_secs_f32();
 
         // Apply noise gate
@@ -351,7 +448,7 @@ async fn run_continuous_capture(
                 let _ = app.emit("audio-encoding-error", e);
             }
         }
-    } else {
+    } else if !was_hard_stop {
         warn!("No audio captured in continuous mode");
         let _ = app.emit("audio-encoding-error", "No audio recorded");
     }
@@ -461,44 +558,46 @@ fn samples_to_wav_b64(sample_rate: u32, mono_f32: &[f32]) -> Result<String, Stri
 #[tauri::command]
 pub async fn stop_system_audio_capture(app: AppHandle) -> Result<(), String> {
     let state = app.state::<crate::AudioState>();
+    state.flush_requested.store(false, Ordering::Release);
+    state.stop_requested.store(true, Ordering::Release);
 
-    // Abort task in separate scope (Send trait fix)
-    {
+    let maybe_task = {
         let mut guard = state
             .stream_task
             .lock()
             .map_err(|e| format!("Failed to acquire task lock: {}", e))?;
+        guard.take()
+    };
 
-        if let Some(task) = guard.take() {
-            task.abort();
-        }
+    if let Some(task) = maybe_task {
+        task.await
+            .map_err(|e| format!("Failed to stop capture task: {}", e))?;
     }
-
-    // LONGER delay for proper cleanup (300ms instead of 150ms)
-    tokio::time::sleep(tokio::time::Duration::from_millis(300)).await;
 
     // Mark as not capturing
     *state
         .is_capturing
         .lock()
         .map_err(|e| format!("Failed to update capturing state: {}", e))? = false;
-
-    // Additional cleanup delay (CRITICAL for mic indicator)
-    tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
+    state.stop_requested.store(false, Ordering::Release);
+    state.flush_requested.store(false, Ordering::Release);
 
     // Emit stopped event
     let _ = app.emit("capture-stopped", ());
     Ok(())
 }
 
+#[tauri::command]
+pub async fn flush_system_audio_capture(app: AppHandle) -> Result<(), String> {
+    let state = app.state::<crate::AudioState>();
+    state.flush_requested.store(true, Ordering::Release);
+    Ok(())
+}
+
 /// Manual stop for continuous recording
 #[tauri::command]
 pub async fn manual_stop_continuous(app: AppHandle) -> Result<(), String> {
-    let _ = app.emit("manual-stop-continuous", ());
-
-    tokio::time::sleep(tokio::time::Duration::from_millis(20)).await;
-
-    Ok(())
+    flush_system_audio_capture(app).await
 }
 
 #[tauri::command]
@@ -623,4 +722,47 @@ pub fn get_output_devices() -> Result<Vec<AudioDevice>, String> {
         error!("Failed to get output devices: {}", e);
         format!("Failed to get output devices: {}", e)
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_vad_config() -> VadConfig {
+        VadConfig {
+            enabled: true,
+            hop_size: 4,
+            sensitivity_rms: 0.012,
+            peak_threshold: 0.035,
+            silence_chunks: 3,
+            min_speech_chunks: 2,
+            pre_speech_chunks: 1,
+            noise_gate_threshold: 0.003,
+            max_recording_duration_secs: 30,
+        }
+    }
+
+    #[test]
+    fn forced_flush_keeps_buffer_without_trimming_trailing_silence() {
+        let config = test_vad_config();
+        let buffer = vec![0.2; 4_000];
+
+        let natural = prepare_vad_segment(&buffer, 3, 700, &config, 16_000, false)
+            .expect("natural stop should emit a segment");
+        let forced = prepare_vad_segment(&buffer, 3, 700, &config, 16_000, true)
+            .expect("forced flush should emit a segment");
+
+        assert!(natural.len() < forced.len());
+        assert_eq!(forced.len(), buffer.len());
+    }
+
+    #[test]
+    fn short_forced_flush_is_discarded() {
+        let config = test_vad_config();
+        let buffer = vec![0.2; 32];
+
+        let segment = prepare_vad_segment(&buffer, 1, 0, &config, 16_000, true);
+
+        assert!(segment.is_none());
+    }
 }

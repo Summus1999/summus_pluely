@@ -2,6 +2,7 @@ import {
   deepVariableReplacer,
   getByPath,
   blobToBase64,
+  extractVariables,
 } from "./common.function";
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 
@@ -51,14 +52,35 @@ export async function fetchSTT(params: STTParams): Promise<string> {
     // }
 
     // Build variable map
+    const normalizedVariables = Object.fromEntries(
+      Object.entries(selectedProvider.variables || {}).map(([key, value]) => [
+        key,
+        typeof value === "string" ? value.trim() : "",
+      ])
+    );
+
+    const requiredVariables = extractVariables(provider.curl).filter(
+      ({ key }) => key !== "audio"
+    );
+
+    for (const { key } of requiredVariables) {
+      if (!normalizedVariables[key]) {
+        throw new Error(`缺少必要变量: ${key}，请在设置中配置。`);
+      }
+    }
+
     const allVariables = {
       ...Object.fromEntries(
-        Object.entries(selectedProvider.variables).map(([key, value]) => [
+        Object.entries(normalizedVariables).map(([key, value]) => [
           key.toUpperCase(),
           value,
         ])
       ),
     };
+
+    if ("MODEL" in allVariables && !String(allVariables.MODEL || "").trim()) {
+      throw new Error("STT model 不能为空，请在设置中填写有效模型。");
+    }
 
     // Prepare request
     let url = deepVariableReplacer(curlJson.url || "", allVariables);
@@ -194,7 +216,7 @@ export async function fetchSTT(params: STTParams): Promise<string> {
     const transcription = (getByPath(data, path) || "").trim();
 
     if (!transcription) {
-      return [...warnings, "未找到转录结果"].join("; ");
+      throw new Error("未找到转录结果");
     }
 
     // Return transcription with any warnings

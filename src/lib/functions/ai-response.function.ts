@@ -175,10 +175,11 @@ export async function* fetchAIResponse(params: {
       ) {
         return; // Silently return on abort
       }
-      yield `API 请求网络错误: ${
-        fetchError instanceof Error ? fetchError.message : "未知错误"
-      }`;
-      return;
+      throw new Error(
+        `API 请求网络错误: ${
+          fetchError instanceof Error ? fetchError.message : "未知错误"
+        }`
+      );
     }
 
     if (!response.ok) {
@@ -186,10 +187,11 @@ export async function* fetchAIResponse(params: {
       try {
         errorText = await response.text();
       } catch {}
-      yield `API 请求失败: ${response.status} ${response.statusText}${
-        errorText ? ` - ${errorText}` : ""
-      }`;
-      return;
+      throw new Error(
+        `API 请求失败: ${response.status} ${response.statusText}${
+          errorText ? ` - ${errorText}` : ""
+        }`
+      );
     }
 
     if (!provider?.streaming) {
@@ -197,10 +199,11 @@ export async function* fetchAIResponse(params: {
       try {
         json = await response.json();
       } catch (parseError) {
-        yield `解析非流式响应失败: ${
-          parseError instanceof Error ? parseError.message : "未知错误"
-        }`;
-        return;
+        throw new Error(
+          `解析非流式响应失败: ${
+            parseError instanceof Error ? parseError.message : "未知错误"
+          }`
+        );
       }
       const content =
         getByPath(json, provider?.responseContentPath || "") || "";
@@ -209,8 +212,7 @@ export async function* fetchAIResponse(params: {
     }
 
     if (!response.body) {
-      yield "不支持流式传输或响应体缺失";
-      return;
+      throw new Error("不支持流式传输或响应体缺失");
     }
 
     const reader = response.body.getReader();
@@ -235,10 +237,11 @@ export async function* fetchAIResponse(params: {
         ) {
           return; // Silently return on abort
         }
-        yield `读取流错误: ${
-          readError instanceof Error ? readError.message : "未知错误"
-        }`;
-        return;
+        throw new Error(
+          `读取流错误: ${
+            readError instanceof Error ? readError.message : "未知错误"
+          }`
+        );
       }
       const { done, value } = readResult;
       if (done) break;
