@@ -144,10 +144,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     // Check if the auto configs are enabled
     const autoConfigsEnabled = localStorage.getItem("auto-configs-enabled");
     if (!autoConfigsEnabled) {
+      // Set default screenshot config for interview scenario
       setScreenshotConfiguration({
         mode: "auto",
-        autoPrompt: "Analyze the screenshot and provide insights",
-        enabled: false,
+        autoPrompt: "这是一个面试题目的截图。请：\n1. 识别题目类型（算法/系统设计/行为/技术等）\n2. 分析题目要求和考察点\n3. 提供详细的解题思路或参考答案\n4. 如果有代码题，给出清晰的代码实现和复杂度分析",
+        enabled: false, // Default to selection mode for better control
       });
       // Set the flag to true so that we don't change the mode again
       localStorage.setItem("auto-configs-enabled", "true");
@@ -502,10 +503,19 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     }
 
     // Update supportsImages immediately when provider changes
+    // Note: Most modern AI providers support images, so we default to true
+    // unless explicitly disabled. The actual support is determined by the
+    // provider's capabilities at runtime.
     const selectedProvider = allAiProviders.find((p) => p.id === provider);
     if (selectedProvider) {
-      const hasImageSupport =
-        selectedProvider.curl?.includes("{{IMAGE}}") ?? false;
+      // Check if provider explicitly indicates image support
+      // Either by having {{IMAGE}} in curl OR by being a known vision-capable provider
+      const knownImageProviders = ['openai', 'anthropic', 'google', 'gemini', 'siliconflow', 'zhipu', 'moonshot', 'qwen'];
+      const hasImagePlaceholder = selectedProvider.curl?.includes("{{IMAGE}}") ?? false;
+      const isKnownImageProvider = knownImageProviders.some(id => 
+        selectedProvider.id?.toLowerCase().includes(id) ?? false
+      );
+      const hasImageSupport = hasImagePlaceholder || isKnownImageProvider;
       setSupportsImages(hasImageSupport);
     } else {
       setSupportsImages(true);

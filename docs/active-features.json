@@ -71,6 +71,29 @@
         ".qoder/skills/conventional-commits/SKILL.md"
       ],
       "verificationStatus": "pending-install"
+    },
+    {
+      "id": "screenshot-fix",
+      "name": "Screenshot Feature Fix",
+      "status": "in_progress",
+      "priority": "high",
+      "startedAt": "2026-03-10",
+      "description": "修复截图功能无法使用的问题，优化面试场景体验",
+      "filesModified": [
+        "src/contexts/app.context.tsx",
+        "docs/screenshot-debug.md"
+      ],
+      "issuesFixed": [
+        {
+          "issue": "supportsImages 检测过于严格",
+          "fix": "扩展支持图片的 Provider 列表，包括国内主流服务商"
+        },
+        {
+          "issue": "默认提示词不适合面试场景",
+          "fix": "添加专门针对面试题目的中文提示词"
+        }
+      ],
+      "verificationStatus": "pending-human-test"
     }
   ],
   "backlog": [
