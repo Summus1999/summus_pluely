@@ -6,7 +6,8 @@ import {
   ChangeEvent,
   ClipboardEvent,
 } from "react";
-import { AttachedFile, ChatMessage, ScreenshotConfig } from "./message";
+import { AttachedFile, ChatConversation, ChatMessage } from "./message";
+import { ScreenshotConfig } from "./settings";
 
 /**
  * UseCompletion Return Type - useCompletion Hook 返回类型
@@ -71,7 +72,7 @@ export interface UseCompletionReturn {
   /** Array of messages in the current conversation */
   conversationHistory: ChatMessage[];
   /** Function to load an existing conversation */
-  loadConversation: (conversation: { id: string; messages: ChatMessage[] }) => void;
+  loadConversation: (conversation: ChatConversation) => void;
   /** Function to start a new conversation (clears current state) */
   startNewConversation: () => void;
 
