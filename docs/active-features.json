@@ -48,6 +48,29 @@
           "completedAt": "2026-03-10"
         }
       ]
+    },
+    {
+      "id": "conventional-commits",
+      "name": "Conventional Commits Setup",
+      "status": "completed",
+      "priority": "high",
+      "startedAt": "2026-03-10",
+      "completedAt": "2026-03-10",
+      "description": "引入 Conventional Commits 规范，自动化 CHANGELOG 生成和版本管理",
+      "filesModified": [
+        "package.json",
+        "commitlint.config.js",
+        ".husky/commit-msg",
+        ".husky/pre-commit",
+        ".lintstagedrc.json",
+        ".versionrc.json",
+        "CHANGELOG.md",
+        ".github/workflows/commitlint.yml",
+        "docs/CONVENTIONAL_COMMITS.md",
+        "scripts/bump-version.sh",
+        ".qoder/skills/conventional-commits/SKILL.md"
+      ],
+      "verificationStatus": "pending-install"
     }
   ],
   "backlog": [
