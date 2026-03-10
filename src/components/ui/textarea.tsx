@@ -1,8 +1,15 @@
-import * as React from "react";
+import type { ComponentProps } from "react";
 
 import { cn } from "@/lib/utils";
 
-function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
+/**
+ * 文本域组件 - 用于多行文本输入
+ * @example
+ * ```tsx
+ * <Textarea placeholder="请输入内容..." />
+ * ```
+ */
+export const Textarea = ({ className, ...props }: ComponentProps<"textarea">) => {
   return (
     <textarea
       data-slot="textarea"
@@ -17,6 +24,4 @@ function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
       {...props}
     />
   );
-}
-
-export { Textarea };
+};

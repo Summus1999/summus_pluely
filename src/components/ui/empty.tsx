@@ -1,8 +1,20 @@
 import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "@/lib/utils";
+import type { ComponentProps } from "react";
 
-function EmptyComponent({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * Empty 组件 - 空状态展示组件
+ *
+ * 用于显示空状态、无数据或占位内容
+ *
+ * @example
+ * <Empty>
+ *   <EmptyMedia><Icon /></EmptyMedia>
+ *   <EmptyTitle>暂无数据</EmptyTitle>
+ *   <EmptyDescription>请添加一些内容</EmptyDescription>
+ * </Empty>
+ */
+export const EmptyComponent = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="empty"
@@ -15,7 +27,10 @@ function EmptyComponent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function EmptyHeader({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * EmptyHeader - 空状态头部
+ */
+export const EmptyHeader = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="empty-header"
@@ -28,6 +43,10 @@ function EmptyHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+/**
+ * EmptyMedia 样式变体配置
+ * @property variant - 媒体变体（default, icon）
+ */
 const emptyMediaVariants = cva(
   "flex shrink-0 items-center justify-center mb-2 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
@@ -43,11 +62,14 @@ const emptyMediaVariants = cva(
   }
 );
 
-function EmptyMedia({
+/**
+ * EmptyMedia - 空状态媒体区域
+ */
+export const EmptyMedia = ({
   className,
   variant = "default",
   ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof emptyMediaVariants>) {
+}: ComponentProps<"div"> & VariantProps<typeof emptyMediaVariants>) => {
   return (
     <div
       data-slot="empty-icon"
@@ -58,7 +80,10 @@ function EmptyMedia({
   );
 }
 
-function EmptyTitle({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * EmptyTitle - 空状态标题
+ */
+export const EmptyTitle = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="empty-title"
@@ -68,7 +93,10 @@ function EmptyTitle({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
+/**
+ * EmptyDescription - 空状态描述
+ */
+export const EmptyDescription = ({ className, ...props }: ComponentProps<"p">) => {
   return (
     <div
       data-slot="empty-description"
@@ -81,7 +109,10 @@ function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
   );
 }
 
-function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * EmptyContent - 空状态内容区域
+ */
+export const EmptyContent = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="empty-content"
@@ -94,11 +125,4 @@ function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-export {
-  EmptyComponent,
-  EmptyHeader,
-  EmptyTitle,
-  EmptyDescription,
-  EmptyContent,
-  EmptyMedia,
-};
+

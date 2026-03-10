@@ -1,8 +1,16 @@
-import * as React from "react";
-
 import { cn } from "@/lib/utils";
+import type { ComponentProps } from "react";
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+/**
+ * Input - 输入框组件
+ *
+ * 基础文本输入组件，支持自定义样式
+ *
+ * @example
+ * <Input placeholder="请输入内容" />
+ * <Input type="password" />
+ */
+export const Input = ({ className, type, ...props }: ComponentProps<"input">) => {
   return (
     <input
       type={type}
@@ -20,6 +28,4 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
       {...props}
     />
   );
-}
-
-export { Input };
+};

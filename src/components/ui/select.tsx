@@ -1,35 +1,70 @@
-import * as React from "react";
+import type { ComponentProps } from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-function Select({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Root>) {
+/**
+ * 选择器组件 - 用于从下拉列表中选择选项
+ * @example
+ * ```tsx
+ * <Select>
+ *   <SelectTrigger>
+ *     <SelectValue placeholder="选择一个选项" />
+ *   </SelectTrigger>
+ *   <SelectContent>
+ *     <SelectItem value="option1">选项1</SelectItem>
+ *     <SelectItem value="option2">选项2</SelectItem>
+ *   </SelectContent>
+ * </Select>
+ * ```
+ */
+export const Select = ({ ...props }: ComponentProps<typeof SelectPrimitive.Root>) => {
   return <SelectPrimitive.Root data-slot="select" {...props} />;
-}
+};
 
-function SelectGroup({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Group>) {
+/**
+ * 选择器分组组件 - 用于对选项进行分组
+ * @example
+ * ```tsx
+ * <SelectGroup>
+ *   <SelectLabel>分组标签</SelectLabel>
+ *   <SelectItem value="item1">项目1</SelectItem>
+ * </SelectGroup>
+ * ```
+ */
+export const SelectGroup = ({ ...props }: ComponentProps<typeof SelectPrimitive.Group>) => {
   return <SelectPrimitive.Group data-slot="select-group" {...props} />;
-}
+};
 
-function SelectValue({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Value>) {
+/**
+ * 选择器值组件 - 显示当前选中的值或占位符
+ * @example
+ * ```tsx
+ * <SelectValue placeholder="请选择..." />
+ * ```
+ */
+export const SelectValue = ({ ...props }: ComponentProps<typeof SelectPrimitive.Value>) => {
   return <SelectPrimitive.Value data-slot="select-value" {...props} />;
-}
+};
 
-function SelectTrigger({
+/**
+ * 选择器触发器组件 - 点击展开下拉列表的按钮
+ * @example
+ * ```tsx
+ * <SelectTrigger>
+ *   <SelectValue placeholder="选择一个选项" />
+ * </SelectTrigger>
+ * ```
+ */
+export const SelectTrigger = ({
   className,
   size = "default",
   children,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
+}: ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: "sm" | "default";
-}) {
+}) => {
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
@@ -46,14 +81,23 @@ function SelectTrigger({
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
-}
+};
 
-function SelectContent({
+/**
+ * 选择器内容组件 - 下拉列表的内容区域
+ * @example
+ * ```tsx
+ * <SelectContent>
+ *   <SelectItem value="option1">选项1</SelectItem>
+ * </SelectContent>
+ * ```
+ */
+export const SelectContent = ({
   className,
   children,
   position = "popper",
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Content>) {
+}: ComponentProps<typeof SelectPrimitive.Content>) => {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
@@ -81,12 +125,16 @@ function SelectContent({
       </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
   );
-}
+};
 
-function SelectLabel({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Label>) {
+/**
+ * 选择器标签组件 - 用于在选项列表中显示分组标签
+ * @example
+ * ```tsx
+ * <SelectLabel>分组名称</SelectLabel>
+ * ```
+ */
+export const SelectLabel = ({ className, ...props }: ComponentProps<typeof SelectPrimitive.Label>) => {
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
@@ -94,13 +142,16 @@ function SelectLabel({
       {...props}
     />
   );
-}
+};
 
-function SelectItem({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Item>) {
+/**
+ * 选择器选项组件 - 下拉列表中的单个选项
+ * @example
+ * ```tsx
+ * <SelectItem value="option1">选项1</SelectItem>
+ * ```
+ */
+export const SelectItem = ({ className, children, ...props }: ComponentProps<typeof SelectPrimitive.Item>) => {
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
@@ -118,12 +169,16 @@ function SelectItem({
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
   );
-}
+};
 
-function SelectSeparator({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Separator>) {
+/**
+ * 选择器分隔线组件 - 用于在选项之间添加分隔线
+ * @example
+ * ```tsx
+ * <SelectSeparator />
+ * ```
+ */
+export const SelectSeparator = ({ className, ...props }: ComponentProps<typeof SelectPrimitive.Separator>) => {
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
@@ -131,12 +186,16 @@ function SelectSeparator({
       {...props}
     />
   );
-}
+};
 
-function SelectScrollUpButton({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.ScrollUpButton>) {
+/**
+ * 选择器向上滚动按钮组件 - 内容过长时显示向上滚动按钮
+ * @example
+ * ```tsx
+ * <SelectScrollUpButton />
+ * ```
+ */
+export const SelectScrollUpButton = ({ className, ...props }: ComponentProps<typeof SelectPrimitive.ScrollUpButton>) => {
   return (
     <SelectPrimitive.ScrollUpButton
       data-slot="select-scroll-up-button"
@@ -149,12 +208,16 @@ function SelectScrollUpButton({
       <ChevronUpIcon className="size-4" />
     </SelectPrimitive.ScrollUpButton>
   );
-}
+};
 
-function SelectScrollDownButton({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.ScrollDownButton>) {
+/**
+ * 选择器向下滚动按钮组件 - 内容过长时显示向下滚动按钮
+ * @example
+ * ```tsx
+ * <SelectScrollDownButton />
+ * ```
+ */
+export const SelectScrollDownButton = ({ className, ...props }: ComponentProps<typeof SelectPrimitive.ScrollDownButton>) => {
   return (
     <SelectPrimitive.ScrollDownButton
       data-slot="select-scroll-down-button"
@@ -167,17 +230,4 @@ function SelectScrollDownButton({
       <ChevronDownIcon className="size-4" />
     </SelectPrimitive.ScrollDownButton>
   );
-}
-
-export {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectScrollDownButton,
-  SelectScrollUpButton,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
 };

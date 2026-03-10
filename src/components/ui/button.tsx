@@ -1,8 +1,16 @@
-import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
+import type { ComponentProps } from "react";
 
+/**
+ * Button 样式变体配置
+ *
+ * 定义按钮的不同视觉样式和尺寸变体
+ *
+ * @property variant - 按钮样式变体（default, destructive, outline, secondary, ghost, link）
+ * @property size - 按钮尺寸变体（default, sm, lg, icon）
+ */
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all cursor-pointer disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring/80 focus-visible:ring-ring/60 focus-visible:ring-[4px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
@@ -34,16 +42,41 @@ const buttonVariants = cva(
   }
 );
 
-function Button({
+/**
+ * Button 组件属性
+ */
+interface ButtonProps
+  extends ComponentProps<"button">,
+    VariantProps<typeof buttonVariants> {
+  /** 是否作为子元素渲染（使用 Radix Slot） */
+  asChild?: boolean;
+}
+
+/**
+ * Button - 按钮组件
+ *
+ * 支持多种样式变体和尺寸，可作为按钮或子元素渲染
+ *
+ * @example
+ * // 默认按钮
+ * <Button>点击我</Button>
+ *
+ * // 破坏性按钮
+ * <Button variant="destructive">删除</Button>
+ *
+ * // 图标按钮
+ * <Button size="icon"><Icon /></Button>
+ *
+ * // 作为子元素渲染
+ * <Button asChild><Link to="/">首页</Link></Button>
+ */
+export const Button = ({
   className,
   variant,
   size,
   asChild = false,
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
+}: ButtonProps) => {
   const Comp = asChild ? Slot : "button";
   return (
     <Comp
@@ -52,6 +85,6 @@ function Button({
       {...props}
     />
   );
-}
+};
 
-export { Button, buttonVariants };
+export { buttonVariants };

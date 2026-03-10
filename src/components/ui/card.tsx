@@ -1,8 +1,20 @@
-import * as React from "react";
-
 import { cn } from "@/lib/utils";
+import type { ComponentProps } from "react";
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * Card - 卡片容器组件
+ *
+ * 用于内容分组的容器组件
+ *
+ * @example
+ * <Card>
+ *   <CardHeader>
+ *     <CardTitle>标题</CardTitle>
+ *   </CardHeader>
+ *   <CardContent>内容</CardContent>
+ * </Card>
+ */
+export const Card = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="card"
@@ -15,7 +27,10 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * CardHeader - 卡片头部组件
+ */
+export const CardHeader = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="card-header"
@@ -28,7 +43,10 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * CardTitle - 卡片标题组件
+ */
+export const CardTitle = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="card-title"
@@ -38,7 +56,10 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * CardDescription - 卡片描述组件
+ */
+export const CardDescription = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="card-description"
@@ -48,7 +69,10 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardAction({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * CardAction - 卡片操作区域组件
+ */
+export const CardAction = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="card-action"
@@ -61,7 +85,10 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardContent({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * CardContent - 卡片内容组件
+ */
+export const CardContent = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="card-content"
@@ -71,7 +98,10 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * CardFooter - 卡片底部组件
+ */
+export const CardFooter = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="card-footer"
@@ -81,12 +111,4 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-export {
-  Card,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardAction,
-  CardDescription,
-  CardContent,
-};
+

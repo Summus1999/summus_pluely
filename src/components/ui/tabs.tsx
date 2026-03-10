@@ -1,14 +1,25 @@
 "use client";
 
-import * as React from "react";
+import type { ComponentProps } from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 
 import { cn } from "@/lib/utils";
 
-function Tabs({
-  className,
-  ...props
-}: React.ComponentProps<typeof TabsPrimitive.Root>) {
+/**
+ * 标签页组件 - 用于在同一区域切换不同内容面板
+ * @example
+ * ```tsx
+ * <Tabs defaultValue="tab1">
+ *   <TabsList>
+ *     <TabsTrigger value="tab1">标签1</TabsTrigger>
+ *     <TabsTrigger value="tab2">标签2</TabsTrigger>
+ *   </TabsList>
+ *   <TabsContent value="tab1">内容1</TabsContent>
+ *   <TabsContent value="tab2">内容2</TabsContent>
+ * </Tabs>
+ * ```
+ */
+export const Tabs = ({ className, ...props }: ComponentProps<typeof TabsPrimitive.Root>) => {
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
@@ -16,12 +27,19 @@ function Tabs({
       {...props}
     />
   );
-}
+};
 
-function TabsList({
-  className,
-  ...props
-}: React.ComponentProps<typeof TabsPrimitive.List>) {
+/**
+ * 标签列表组件 - 包含所有标签触发器的容器
+ * @example
+ * ```tsx
+ * <TabsList>
+ *   <TabsTrigger value="tab1">标签1</TabsTrigger>
+ *   <TabsTrigger value="tab2">标签2</TabsTrigger>
+ * </TabsList>
+ * ```
+ */
+export const TabsList = ({ className, ...props }: ComponentProps<typeof TabsPrimitive.List>) => {
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
@@ -32,12 +50,16 @@ function TabsList({
       {...props}
     />
   );
-}
+};
 
-function TabsTrigger({
-  className,
-  ...props
-}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+/**
+ * 标签触发器组件 - 点击切换对应标签内容
+ * @example
+ * ```tsx
+ * <TabsTrigger value="tab1">标签1</TabsTrigger>
+ * ```
+ */
+export const TabsTrigger = ({ className, ...props }: ComponentProps<typeof TabsPrimitive.Trigger>) => {
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
@@ -48,12 +70,16 @@ function TabsTrigger({
       {...props}
     />
   );
-}
+};
 
-function TabsContent({
-  className,
-  ...props
-}: React.ComponentProps<typeof TabsPrimitive.Content>) {
+/**
+ * 标签内容组件 - 显示对应标签的内容面板
+ * @example
+ * ```tsx
+ * <TabsContent value="tab1">标签1的内容</TabsContent>
+ * ```
+ */
+export const TabsContent = ({ className, ...props }: ComponentProps<typeof TabsPrimitive.Content>) => {
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
@@ -61,6 +87,4 @@ function TabsContent({
       {...props}
     />
   );
-}
-
-export { Tabs, TabsList, TabsTrigger, TabsContent };
+};

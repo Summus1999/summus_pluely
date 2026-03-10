@@ -1,12 +1,17 @@
-import * as React from "react"
-import * as LabelPrimitive from "@radix-ui/react-label"
+import type { ComponentProps } from "react";
+import * as LabelPrimitive from "@radix-ui/react-label";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-function Label({
-  className,
-  ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+/**
+ * 标签组件 - 用于表单字段的标签说明
+ * @example
+ * ```tsx
+ * <Label htmlFor="email">邮箱地址</Label>
+ * <Input id="email" type="email" />
+ * ```
+ */
+export const Label = ({ className, ...props }: ComponentProps<typeof LabelPrimitive.Root>) => {
   return (
     <LabelPrimitive.Root
       data-slot="label"
@@ -16,7 +21,5 @@ function Label({
       )}
       {...props}
     />
-  )
-}
-
-export { Label }
+  );
+};

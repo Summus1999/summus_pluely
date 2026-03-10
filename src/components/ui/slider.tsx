@@ -1,17 +1,24 @@
-import * as React from "react"
-import * as SliderPrimitive from "@radix-ui/react-slider"
+import { useMemo, type ComponentProps } from "react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
-function Slider({
+/**
+ * 滑块组件 - 用于选择数值范围内的值
+ * @example
+ * ```tsx
+ * <Slider defaultValue={[50]} max={100} step={1} />
+ * ```
+ */
+export const Slider = ({
   className,
   defaultValue,
   value,
   min = 0,
   max = 100,
   ...props
-}: React.ComponentProps<typeof SliderPrimitive.Root>) {
-  const _values = React.useMemo(
+}: ComponentProps<typeof SliderPrimitive.Root>) => {
+  const _values = useMemo(
     () =>
       Array.isArray(value)
         ? value
@@ -19,7 +26,7 @@ function Slider({
           ? defaultValue
           : [min, max],
     [value, defaultValue, min, max]
-  )
+  );
 
   return (
     <SliderPrimitive.Root
@@ -55,7 +62,5 @@ function Slider({
         />
       ))}
     </SliderPrimitive.Root>
-  )
-}
-
-export { Slider }
+  );
+};

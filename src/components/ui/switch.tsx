@@ -1,12 +1,16 @@
-import * as React from "react";
+import type { ComponentProps } from "react";
 import * as SwitchPrimitive from "@radix-ui/react-switch";
 
 import { cn } from "@/lib/utils";
 
-function Switch({
-  className,
-  ...props
-}: React.ComponentProps<typeof SwitchPrimitive.Root>) {
+/**
+ * 开关组件 - 用于切换两种状态（开/关）
+ * @example
+ * ```tsx
+ * <Switch checked={enabled} onCheckedChange={setEnabled} />
+ * ```
+ */
+export const Switch = ({ className, ...props }: ComponentProps<typeof SwitchPrimitive.Root>) => {
   return (
     <SwitchPrimitive.Root
       data-slot="switch"
@@ -24,6 +28,4 @@ function Switch({
       />
     </SwitchPrimitive.Root>
   );
-}
-
-export { Switch };
+};

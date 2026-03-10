@@ -1,19 +1,32 @@
 "use client";
 
-import * as React from "react";
+import type { ComponentProps } from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 import { cn } from "@/lib/utils";
 
-function Popover({
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Root>) {
+/**
+ * 弹出框组件 - 用于显示悬浮在触发元素旁边的内容
+ * @example
+ * ```tsx
+ * <Popover>
+ *   <PopoverTrigger>点击打开</PopoverTrigger>
+ *   <PopoverContent>弹出内容</PopoverContent>
+ * </Popover>
+ * ```
+ */
+export const Popover = ({ ...props }: ComponentProps<typeof PopoverPrimitive.Root>) => {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />;
-}
+};
 
-function PopoverTrigger({
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
+/**
+ * 弹出框触发器组件 - 用于触发弹出框显示
+ * @example
+ * ```tsx
+ * <PopoverTrigger>点击我</PopoverTrigger>
+ * ```
+ */
+export const PopoverTrigger = ({ ...props }: ComponentProps<typeof PopoverPrimitive.Trigger>) => {
   return (
     <PopoverPrimitive.Trigger
       data-slot="popover-trigger"
@@ -24,14 +37,23 @@ function PopoverTrigger({
       )}
     />
   );
-}
+};
 
-function PopoverContent({
+/**
+ * 弹出框内容组件 - 弹出框的主要内容区域
+ * @example
+ * ```tsx
+ * <PopoverContent>
+ *   <p>弹出框内容</p>
+ * </PopoverContent>
+ * ```
+ */
+export const PopoverContent = ({
   className,
   align = "center",
   sideOffset = 4,
   ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+}: ComponentProps<typeof PopoverPrimitive.Content>) => {
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
@@ -47,12 +69,17 @@ function PopoverContent({
       />
     </PopoverPrimitive.Portal>
   );
-}
+};
 
-function PopoverAnchor({
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {
+/**
+ * 弹出框锚点组件 - 用于定位弹出框的锚点元素
+ * @example
+ * ```tsx
+ * <PopoverAnchor>
+ *   <Button>锚点</Button>
+ * </PopoverAnchor>
+ * ```
+ */
+export const PopoverAnchor = ({ ...props }: ComponentProps<typeof PopoverPrimitive.Anchor>) => {
   return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />;
-}
-
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor };
+};

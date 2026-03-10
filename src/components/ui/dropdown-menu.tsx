@@ -1,26 +1,45 @@
-import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
-
 import { cn } from "@/lib/utils"
+import type { ComponentProps } from "react"
 
-function DropdownMenu({
+/**
+ * DropdownMenu - 下拉菜单组件
+ *
+ * 基于 Radix UI 的下拉菜单组件
+ *
+ * @example
+ * <DropdownMenu>
+ *   <DropdownMenuTrigger>打开菜单</DropdownMenuTrigger>
+ *   <DropdownMenuContent>
+ *     <DropdownMenuItem>选项一</DropdownMenuItem>
+ *     <DropdownMenuItem>选项二</DropdownMenuItem>
+ *   </DropdownMenuContent>
+ * </DropdownMenu>
+ */
+export const DropdownMenu = ({
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
+}: ComponentProps<typeof DropdownMenuPrimitive.Root>) => {
   return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />
 }
 
-function DropdownMenuPortal({
+/**
+ * DropdownMenuPortal - 下拉菜单传送门
+ */
+export const DropdownMenuPortal = ({
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
+}: ComponentProps<typeof DropdownMenuPrimitive.Portal>) => {
   return (
     <DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />
   )
 }
 
-function DropdownMenuTrigger({
+/**
+ * DropdownMenuTrigger - 下拉菜单触发器
+ */
+export const DropdownMenuTrigger = ({
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
+}: ComponentProps<typeof DropdownMenuPrimitive.Trigger>) => {
   return (
     <DropdownMenuPrimitive.Trigger
       data-slot="dropdown-menu-trigger"
@@ -29,11 +48,14 @@ function DropdownMenuTrigger({
   )
 }
 
-function DropdownMenuContent({
+/**
+ * DropdownMenuContent - 下拉菜单内容
+ */
+export const DropdownMenuContent = ({
   className,
   sideOffset = 4,
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
+}: ComponentProps<typeof DropdownMenuPrimitive.Content>) => {
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
@@ -49,23 +71,29 @@ function DropdownMenuContent({
   )
 }
 
-function DropdownMenuGroup({
+/**
+ * DropdownMenuGroup - 下拉菜单分组
+ */
+export const DropdownMenuGroup = ({
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Group>) {
+}: ComponentProps<typeof DropdownMenuPrimitive.Group>) => {
   return (
     <DropdownMenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
   )
 }
 
-function DropdownMenuItem({
+/**
+ * DropdownMenuItem - 下拉菜单项
+ */
+export const DropdownMenuItem = ({
   className,
   inset,
   variant = "default",
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
+}: ComponentProps<typeof DropdownMenuPrimitive.Item> & {
   inset?: boolean
   variant?: "default" | "destructive"
-}) {
+}) => {
   return (
     <DropdownMenuPrimitive.Item
       data-slot="dropdown-menu-item"
@@ -80,12 +108,15 @@ function DropdownMenuItem({
   )
 }
 
-function DropdownMenuCheckboxItem({
+/**
+ * DropdownMenuCheckboxItem - 复选框菜单项
+ */
+export const DropdownMenuCheckboxItem = ({
   className,
   children,
   checked,
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>) {
+}: ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>) => {
   return (
     <DropdownMenuPrimitive.CheckboxItem
       data-slot="dropdown-menu-checkbox-item"
@@ -106,9 +137,12 @@ function DropdownMenuCheckboxItem({
   )
 }
 
-function DropdownMenuRadioGroup({
+/**
+ * DropdownMenuRadioGroup - 单选框组
+ */
+export const DropdownMenuRadioGroup = ({
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.RadioGroup>) {
+}: ComponentProps<typeof DropdownMenuPrimitive.RadioGroup>) => {
   return (
     <DropdownMenuPrimitive.RadioGroup
       data-slot="dropdown-menu-radio-group"
@@ -117,11 +151,14 @@ function DropdownMenuRadioGroup({
   )
 }
 
-function DropdownMenuRadioItem({
+/**
+ * DropdownMenuRadioItem - 单选框菜单项
+ */
+export const DropdownMenuRadioItem = ({
   className,
   children,
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.RadioItem>) {
+}: ComponentProps<typeof DropdownMenuPrimitive.RadioItem>) => {
   return (
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
@@ -141,13 +178,16 @@ function DropdownMenuRadioItem({
   )
 }
 
-function DropdownMenuLabel({
+/**
+ * DropdownMenuLabel - 菜单标签
+ */
+export const DropdownMenuLabel = ({
   className,
   inset,
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Label> & {
+}: ComponentProps<typeof DropdownMenuPrimitive.Label> & {
   inset?: boolean
-}) {
+}) => {
   return (
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
@@ -161,10 +201,13 @@ function DropdownMenuLabel({
   )
 }
 
-function DropdownMenuSeparator({
+/**
+ * DropdownMenuSeparator - 分隔线
+ */
+export const DropdownMenuSeparator = ({
   className,
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
+}: ComponentProps<typeof DropdownMenuPrimitive.Separator>) => {
   return (
     <DropdownMenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
@@ -174,10 +217,13 @@ function DropdownMenuSeparator({
   )
 }
 
-function DropdownMenuShortcut({
+/**
+ * DropdownMenuShortcut - 快捷键提示
+ */
+export const DropdownMenuShortcut = ({
   className,
   ...props
-}: React.ComponentProps<"span">) {
+}: ComponentProps<"span">) => {
   return (
     <span
       data-slot="dropdown-menu-shortcut"
@@ -190,20 +236,26 @@ function DropdownMenuShortcut({
   )
 }
 
-function DropdownMenuSub({
+/**
+ * DropdownMenuSub - 子菜单
+ */
+export const DropdownMenuSub = ({
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) {
+}: ComponentProps<typeof DropdownMenuPrimitive.Sub>) => {
   return <DropdownMenuPrimitive.Sub data-slot="dropdown-menu-sub" {...props} />
 }
 
-function DropdownMenuSubTrigger({
+/**
+ * DropdownMenuSubTrigger - 子菜单触发器
+ */
+export const DropdownMenuSubTrigger = ({
   className,
   inset,
   children,
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.SubTrigger> & {
+}: ComponentProps<typeof DropdownMenuPrimitive.SubTrigger> & {
   inset?: boolean
-}) {
+}) => {
   return (
     <DropdownMenuPrimitive.SubTrigger
       data-slot="dropdown-menu-sub-trigger"
@@ -220,10 +272,13 @@ function DropdownMenuSubTrigger({
   )
 }
 
-function DropdownMenuSubContent({
+/**
+ * DropdownMenuSubContent - 子菜单内容
+ */
+export const DropdownMenuSubContent = ({
   className,
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
+}: ComponentProps<typeof DropdownMenuPrimitive.SubContent>) => {
   return (
     <DropdownMenuPrimitive.SubContent
       data-slot="dropdown-menu-sub-content"
@@ -234,22 +289,4 @@ function DropdownMenuSubContent({
       {...props}
     />
   )
-}
-
-export {
-  DropdownMenu,
-  DropdownMenuPortal,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
-  DropdownMenuItem,
-  DropdownMenuCheckboxItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
 }

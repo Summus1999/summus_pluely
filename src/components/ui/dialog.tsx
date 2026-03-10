@@ -1,34 +1,60 @@
-import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
+import type { ComponentProps } from "react";
 
-function Dialog({
+/**
+ * Dialog - 对话框组件
+ *
+ * 基于 Radix UI 的模态对话框组件
+ *
+ * @example
+ * <Dialog>
+ *   <DialogTrigger>打开</DialogTrigger>
+ *   <DialogContent>
+ *     <DialogHeader>
+ *       <DialogTitle>标题</DialogTitle>
+ *     </DialogHeader>
+ *   </DialogContent>
+ * </Dialog>
+ */
+export const Dialog = ({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
 
-function DialogTrigger({
+/**
+ * DialogTrigger - 对话框触发器
+ */
+export const DialogTrigger = ({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
 }
 
-function DialogPortal({
+/**
+ * DialogPortal - 对话框传送门
+ */
+export const DialogPortal = ({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />;
 }
 
-function DialogClose({
+/**
+ * DialogClose - 对话框关闭按钮
+ */
+export const DialogClose = ({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Close>) {
   return <DialogPrimitive.Close data-slot="dialog-close" {...props} />;
 }
 
-function DialogOverlay({
+/**
+ * DialogOverlay - 对话框遮罩层
+ */
+export const DialogOverlay = ({
   className,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
@@ -44,7 +70,10 @@ function DialogOverlay({
   );
 }
 
-function DialogContent({
+/**
+ * DialogContent - 对话框内容区域
+ */
+export const DialogContent = ({
   className,
   children,
   showCloseButton = true,
@@ -78,7 +107,10 @@ function DialogContent({
   );
 }
 
-function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * DialogHeader - 对话框头部
+ */
+export const DialogHeader = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="dialog-header"
@@ -88,7 +120,10 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
+/**
+ * DialogFooter - 对话框底部
+ */
+export const DialogFooter = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       data-slot="dialog-footer"
@@ -101,7 +136,10 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function DialogTitle({
+/**
+ * DialogTitle - 对话框标题
+ */
+export const DialogTitle = ({
   className,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Title>) {
@@ -114,7 +152,10 @@ function DialogTitle({
   );
 }
 
-function DialogDescription({
+/**
+ * DialogDescription - 对话框描述
+ */
+export const DialogDescription = ({
   className,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Description>) {
@@ -127,15 +168,4 @@ function DialogDescription({
   );
 }
 
-export {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-  DialogTrigger,
-};
+
