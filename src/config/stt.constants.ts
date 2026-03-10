@@ -1,4 +1,11 @@
-export const SPEECH_TO_TEXT_PROVIDERS = [
+import type { STTProvider } from "@/types";
+
+/**
+ * Speech-to-Text Provider configurations
+ * Each provider includes a cURL template that will be processed at runtime
+ * Placeholders: {{API_KEY}}, {{MODEL}}, {{AUDIO}}, {{PROJECT_ID}}, {{REGION}}, {{OPTIONS}}
+ */
+export const SPEECH_TO_TEXT_PROVIDERS: STTProvider[] = [
   {
     id: "openai-whisper",
     name: "OpenAI Whisper",

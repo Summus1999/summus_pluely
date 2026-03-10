@@ -1,4 +1,11 @@
-export const AI_PROVIDERS = [
+import type { AIProvider } from "@/types";
+
+/**
+ * AI Provider configurations
+ * Each provider includes a cURL template that will be processed at runtime
+ * Placeholders: {{API_KEY}}, {{MODEL}}, {{SYSTEM_PROMPT}}, {{TEXT}}, {{IMAGE}}
+ */
+export const AI_PROVIDERS: AIProvider[] = [
   {
     id: "openai",
     curl: `curl https://api.openai.com/v1/chat/completions \\
@@ -78,19 +85,19 @@ export const AI_PROVIDERS = [
   },
   {
     id: "groq",
-    curl: `curl https://api.groq.com/openai/v1/chat/completions \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer {{API_KEY}}" \
-    -d '{
-      "model": "{{MODEL}}",
-      "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}],
-      "temperature": 1,
-      "max_completion_tokens": 8192,
-      "top_p": 1,
-      "stream": true,
-      "reasoning_effort": "medium",
-      "stop": null
-    }'`,
+    curl: `curl https://api.groq.com/openai/v1/chat/completions \\
+      -H "Content-Type: application/json" \\
+      -H "Authorization: Bearer {{API_KEY}}" \\
+      -d '{
+        "model": "{{MODEL}}",
+        "messages": [{"role": "system", "content": "{{SYSTEM_PROMPT}}"}, {"role": "user", "content": [{"type": "text", "text": "{{TEXT}}"}, {"type": "image_url", "image_url": {"url": "data:image/png;base64,{{IMAGE}}"}}]}],
+        "temperature": 1,
+        "max_completion_tokens": 8192,
+        "top_p": 1,
+        "stream": true,
+        "reasoning_effort": "medium",
+        "stop": null
+      }'`,
     responseContentPath: "choices[0].message.content",
     streaming: true,
   },
@@ -108,8 +115,8 @@ export const AI_PROVIDERS = [
   },
   {
     id: "openrouter",
-    curl: `  curl https://openrouter.ai/api/v1/chat/completions \
-  -H "Content-Type: application/json" \
+    curl: `curl https://openrouter.ai/api/v1/chat/completions \\
+      -H "Content-Type: application/json" \
   -H "Authorization: Bearer {{API_KEY}}" \
   -d '{
     "model": "{{MODEL}}",
