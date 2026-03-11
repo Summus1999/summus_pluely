@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { useApp } from "@/contexts";
 import { MAX_FILES } from "@/config";
 import {
-  fetchAIResponse,
+  streamProviderChatResponse,
   saveConversation,
   getConversationById,
   generateConversationTitle,
@@ -200,8 +200,8 @@ export const useChatCompletion = (
         let fullResponse = "";
 
         try {
-          // Use the fetchAIResponse function with signal
-          for await (const chunk of fetchAIResponse({
+          fullResponse = await streamProviderChatResponse({
+            requestId,
             provider,
             selectedProvider: selectedAIProvider,
             systemPrompt: systemPrompt || undefined,
@@ -209,52 +209,39 @@ export const useChatCompletion = (
             userMessage: input,
             imagesBase64,
             signal,
-          })) {
-            // Only update if this is still the current request
-            if (currentRequestIdRef.current !== requestId) {
-              return; // Request was superseded, stop processing
-            }
+            onChunk: (_chunk, accumulatedResponse) => {
+              if (currentRequestIdRef.current !== requestId || signal.aborted) {
+                return;
+              }
 
-            // Check if request was aborted
-            if (signal.aborted) {
-              return; // Request was cancelled, stop processing
-            }
+              const assistantMsg: ChatMessage = {
+                id: generateMessageId("assistant", timestamp + MESSAGE_ID_OFFSET),
+                role: "assistant",
+                content: accumulatedResponse,
+                timestamp: timestamp + MESSAGE_ID_OFFSET,
+              };
 
-            fullResponse += chunk;
+              const updatedWithResponse = {
+                ...updatedMessages,
+                messages: [...updatedMessages.messages, assistantMsg],
+              };
 
-            // Update the last message (assistant's response) in real-time
-            const assistantMsg: ChatMessage = {
-              id: generateMessageId("assistant", timestamp + MESSAGE_ID_OFFSET),
-              role: "assistant",
-              content: fullResponse,
-              timestamp: timestamp + MESSAGE_ID_OFFSET,
-            };
+              const lastMessage =
+                updatedWithResponse.messages[
+                  updatedWithResponse.messages.length - 1
+                ];
+              if (lastMessage.role === "assistant") {
+                updatedWithResponse.messages[
+                  updatedWithResponse.messages.length - 1
+                ] = assistantMsg;
+              } else {
+                updatedWithResponse.messages.push(assistantMsg);
+              }
 
-            const updatedWithResponse = {
-              ...updatedMessages,
-              messages: [...updatedMessages.messages, assistantMsg],
-            };
-
-            // Check if assistant message already exists
-            const lastMessage =
-              updatedWithResponse.messages[
-                updatedWithResponse.messages.length - 1
-              ];
-            if (lastMessage.role === "assistant") {
-              // Update existing assistant message
-              updatedWithResponse.messages[
-                updatedWithResponse.messages.length - 1
-              ] = assistantMsg;
-            } else {
-              // Add new assistant message
-              updatedWithResponse.messages.push(assistantMsg);
-            }
-
-            setMessages(updatedWithResponse);
-
-            // Auto-scroll during streaming
-            scrollToBottom();
-          }
+              setMessages(updatedWithResponse);
+              scrollToBottom();
+            },
+          });
         } catch (e: any) {
           // Only show error if this is still the current request and not aborted
           if (currentRequestIdRef.current === requestId && !signal.aborted) {

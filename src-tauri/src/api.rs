@@ -3,11 +3,17 @@ use futures_util::StreamExt;
 use reqwest::multipart::{Form, Part};
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::collections::HashMap;
 use std::env;
 use std::fs;
 use std::path::PathBuf;
+use std::time::Duration;
 use tauri::{AppHandle, Emitter, Manager};
 use tauri_plugin_machine_uid::MachineUidExt;
+
+const FETCH_TIMEOUT_SECS: u64 = 30;
+const STREAM_READ_TIMEOUT_SECS: u64 = 15;
 
 fn get_app_endpoint() -> Result<String, String> {
     if let Ok(endpoint) = env::var("APP_ENDPOINT") {
@@ -110,6 +116,32 @@ pub struct ModelsResponse {
 pub struct SystemPromptResponse {
     prompt_name: String,
     system_prompt: String,
+}
+
+#[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+struct ChatStreamChunkEvent {
+    request_id: String,
+    chunk: String,
+}
+
+#[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+struct ChatStreamCompleteEvent {
+    request_id: String,
+    full_response: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProviderStreamRequest {
+    request_id: String,
+    url: String,
+    method: String,
+    headers: HashMap<String, String>,
+    body: Option<String>,
+    response_content_path: String,
+    streaming: bool,
 }
 
 // Pluely Prompts API
@@ -372,6 +404,213 @@ fn map_api_error_message(error_rules: &[ApiConfigError], sources: &[String]) -> 
         })
 }
 
+fn get_by_path<'a>(value: &'a Value, path: &str) -> Option<&'a Value> {
+    if path.trim().is_empty() {
+        return Some(value);
+    }
+
+    let normalized = path.replace('[', ".").replace(']', "");
+    let mut current = value;
+
+    for segment in normalized.split('.') {
+        if segment.is_empty() {
+            continue;
+        }
+
+        if let Ok(index) = segment.parse::<usize>() {
+            current = current.as_array()?.get(index)?;
+        } else {
+            current = current.get(segment)?;
+        }
+    }
+
+    Some(current)
+}
+
+fn extract_response_content(value: &Value, path: &str) -> Option<String> {
+    get_by_path(value, path).and_then(|content| match content {
+        Value::String(text) if !text.is_empty() => Some(text.clone()),
+        _ => None,
+    })
+}
+
+fn get_streaming_content(chunk: &Value, default_path: &str) -> Option<String> {
+    let fallback_path = default_path.replace(".message.", ".delta.");
+    let possible_paths = [
+        fallback_path.as_str(),
+        "choices[0].delta.content",
+        "candidates[0].content.parts[0].text",
+        "delta.text",
+        "text",
+        default_path,
+    ];
+
+    for path in possible_paths {
+        if let Some(content) = extract_response_content(chunk, path) {
+            return Some(content);
+        }
+    }
+
+    None
+}
+
+async fn execute_provider_stream_request(
+    app: &AppHandle,
+    request: &ProviderStreamRequest,
+) -> Result<String, String> {
+    let method = request
+        .method
+        .parse::<reqwest::Method>()
+        .map_err(|e| format!("Invalid HTTP method: {}", e))?;
+
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(FETCH_TIMEOUT_SECS))
+        .build()
+        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
+
+    let mut builder = client.request(method, &request.url);
+    for (key, value) in &request.headers {
+        builder = builder.header(key, value);
+    }
+    if let Some(body) = &request.body {
+        builder = builder.body(body.clone());
+    }
+
+    let response = builder
+        .send()
+        .await
+        .map_err(|e| format!("Provider request failed: {}", e))?;
+
+    if !response.status().is_success() {
+        let status = response.status();
+        let error_text = response
+            .text()
+            .await
+            .unwrap_or_else(|_| "Unable to read error response".to_string());
+        return Err(format!("Provider request failed: {} {}", status, error_text));
+    }
+
+    if !request.streaming {
+        let body_text = response
+            .text()
+            .await
+            .map_err(|e| format!("Failed to read provider response: {}", e))?;
+
+        if let Ok(json) = serde_json::from_str::<Value>(&body_text) {
+            if let Some(content) = extract_response_content(&json, &request.response_content_path) {
+                let _ = app.emit(
+                    "chat_stream_complete",
+                    ChatStreamCompleteEvent {
+                        request_id: request.request_id.clone(),
+                        full_response: content.clone(),
+                    },
+                );
+                return Ok(content);
+            }
+        }
+
+        let trimmed = body_text.trim().to_string();
+        let _ = app.emit(
+            "chat_stream_complete",
+            ChatStreamCompleteEvent {
+                request_id: request.request_id.clone(),
+                full_response: trimmed.clone(),
+            },
+        );
+        return Ok(trimmed);
+    }
+
+    let mut stream = response.bytes_stream();
+    let mut full_response = String::new();
+    let mut buffer = String::new();
+
+    loop {
+        let next_item = tokio::time::timeout(
+            Duration::from_secs(STREAM_READ_TIMEOUT_SECS),
+            stream.next(),
+        )
+        .await;
+
+        match next_item {
+            Err(_) => {
+                if full_response.is_empty() {
+                    return Err(format!(
+                        "Provider stream read timed out after {}s",
+                        STREAM_READ_TIMEOUT_SECS
+                    ));
+                }
+                break;
+            }
+            Ok(None) => break,
+            Ok(Some(Err(e))) => {
+                return Err(format!("Provider stream read failed: {}", e));
+            }
+            Ok(Some(Ok(bytes))) => {
+                let chunk_str = String::from_utf8_lossy(&bytes);
+                buffer.push_str(&chunk_str);
+
+                let lines: Vec<&str> = buffer.split('\n').collect();
+                let incomplete_line = lines.last().unwrap_or(&"").to_string();
+
+                for line in &lines[..lines.len().saturating_sub(1)] {
+                    let trimmed_line = line.trim();
+                    if !trimmed_line.starts_with("data:") {
+                        continue;
+                    }
+
+                    let json_str = trimmed_line.trim_start_matches("data:").trim();
+                    if json_str.is_empty() {
+                        continue;
+                    }
+                    if json_str == "[DONE]" {
+                        break;
+                    }
+
+                    if let Ok(parsed) = serde_json::from_str::<Value>(json_str) {
+                        if let Some(content) =
+                            get_streaming_content(&parsed, &request.response_content_path)
+                        {
+                            full_response.push_str(&content);
+                            let _ = app.emit(
+                                "chat_stream_chunk",
+                                ChatStreamChunkEvent {
+                                    request_id: request.request_id.clone(),
+                                    chunk: content,
+                                },
+                            );
+                        }
+                    }
+                }
+
+                buffer = incomplete_line;
+            }
+        }
+    }
+
+    if full_response.is_empty() && !buffer.trim().is_empty() {
+        let trailing = buffer
+            .trim()
+            .trim_start_matches("data:")
+            .trim();
+        if let Ok(parsed) = serde_json::from_str::<Value>(trailing) {
+            if let Some(content) = extract_response_content(&parsed, &request.response_content_path)
+            {
+                full_response = content;
+            }
+        }
+    }
+
+    let _ = app.emit(
+        "chat_stream_complete",
+        ChatStreamCompleteEvent {
+            request_id: request.request_id.clone(),
+            full_response: full_response.clone(),
+        },
+    );
+
+    Ok(full_response)
+}
+
 fn decode_audio_base64(audio_base64: &str) -> Result<Vec<u8>, String> {
     let trimmed = audio_base64.trim();
     let base64_str = if let Some(idx) = trimmed.find(',') {
@@ -464,6 +703,7 @@ async fn perform_user_audio_transcription(
 #[tauri::command]
 pub async fn chat_stream_response(
     app: AppHandle,
+    request_id: String,
     user_message: String,
     system_prompt: Option<String>,
     image_base64: Option<serde_json::Value>,
@@ -674,8 +914,13 @@ pub async fn chat_stream_response(
                                                 delta.get("content").and_then(|c| c.as_str())
                                             {
                                                 full_response.push_str(content);
-                                                // Emit just the content to frontend
-                                                let _ = app.emit("chat_stream_chunk", content);
+                                                let _ = app.emit(
+                                                    "chat_stream_chunk",
+                                                    ChatStreamChunkEvent {
+                                                        request_id: request_id.clone(),
+                                                        chunk: content.to_string(),
+                                                    },
+                                                );
                                                 stream_started = true;
                                             }
                                         }
@@ -708,7 +953,13 @@ pub async fn chat_stream_response(
     }
 
     // Emit completion event
-    let _ = app.emit("chat_stream_complete", &full_response);
+    let _ = app.emit(
+        "chat_stream_complete",
+        ChatStreamCompleteEvent {
+            request_id: request_id.clone(),
+            full_response: full_response.clone(),
+        },
+    );
 
     if stream_started && !full_response.is_empty() {
         tauri::async_runtime::spawn({
@@ -729,6 +980,14 @@ pub async fn chat_stream_response(
     }
 
     Ok(full_response)
+}
+
+#[tauri::command]
+pub async fn stream_provider_response(
+    app: AppHandle,
+    request: ProviderStreamRequest,
+) -> Result<String, String> {
+    execute_provider_stream_request(&app, &request).await
 }
 
 async fn user_activity(
@@ -795,6 +1054,47 @@ async fn user_activity(
         .await;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn get_by_path_reads_nested_arrays_and_objects() {
+        let value = serde_json::json!({
+            "choices": [
+                {
+                    "delta": {
+                        "content": "hello"
+                    }
+                }
+            ]
+        });
+
+        let content = get_by_path(&value, "choices[0].delta.content")
+            .and_then(|item| item.as_str())
+            .unwrap();
+
+        assert_eq!(content, "hello");
+    }
+
+    #[test]
+    fn get_streaming_content_prefers_delta_path() {
+        let chunk = serde_json::json!({
+            "choices": [
+                {
+                    "delta": {
+                        "content": "streamed"
+                    }
+                }
+            ]
+        });
+
+        let content = get_streaming_content(&chunk, "choices[0].message.content").unwrap();
+
+        assert_eq!(content, "streamed");
+    }
 }
 
 async fn report_api_error(

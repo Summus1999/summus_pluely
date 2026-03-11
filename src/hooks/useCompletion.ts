@@ -4,7 +4,7 @@ import { useGlobalShortcuts } from "@/hooks";
 import { MAX_FILES } from "@/config";
 import { useApp } from "@/contexts";
 import {
-  fetchAIResponse,
+  streamProviderChatResponse,
   saveConversation,
   getConversationById,
   generateConversationTitle,
@@ -185,8 +185,8 @@ export const useCompletion = () => {
         }));
 
         try {
-          // Use the fetchAIResponse function with signal
-          for await (const chunk of fetchAIResponse({
+          fullResponse = await streamProviderChatResponse({
+            requestId,
             provider,
             selectedProvider: selectedAIProvider,
             systemPrompt: systemPrompt || undefined,
@@ -194,23 +194,17 @@ export const useCompletion = () => {
             userMessage: input,
             imagesBase64,
             signal,
-          })) {
-            // Only update if this is still the current request
-            if (currentRequestIdRef.current !== requestId) {
-              return; // Request was superseded, stop processing
-            }
+            onChunk: (chunk) => {
+              if (currentRequestIdRef.current !== requestId || signal.aborted) {
+                return;
+              }
 
-            // Check if request was aborted
-            if (signal.aborted) {
-              return; // Request was cancelled, stop processing
-            }
-
-            fullResponse += chunk;
-            setState((prev) => ({
-              ...prev,
-              response: prev.response + chunk,
-            }));
-          }
+              setState((prev) => ({
+                ...prev,
+                response: prev.response + chunk,
+              }));
+            },
+          });
         } catch (e: any) {
           // Only show error if this is still the current request and not aborted
           if (currentRequestIdRef.current === requestId && !signal.aborted) {
@@ -583,8 +577,8 @@ export const useCompletion = () => {
               response: "",
             }));
 
-            // Use the fetchAIResponse function with image and signal
-            for await (const chunk of fetchAIResponse({
+            fullResponse = await streamProviderChatResponse({
+              requestId,
               provider,
               selectedProvider: selectedAIProvider,
               systemPrompt: systemPrompt || undefined,
@@ -592,18 +586,17 @@ export const useCompletion = () => {
               userMessage: prompt,
               imagesBase64: [base64],
               signal,
-            })) {
-              // Only update if this is still the current request
-              if (currentRequestIdRef.current !== requestId || signal.aborted) {
-                return; // Request was superseded or cancelled
-              }
+              onChunk: (chunk) => {
+                if (currentRequestIdRef.current !== requestId || signal.aborted) {
+                  return;
+                }
 
-              fullResponse += chunk;
-              setState((prev) => ({
-                ...prev,
-                response: prev.response + chunk,
-              }));
-            }
+                setState((prev) => ({
+                  ...prev,
+                  response: prev.response + chunk,
+                }));
+              },
+            });
 
             // Only proceed if this is still the current request
             if (currentRequestIdRef.current !== requestId || signal.aborted) {

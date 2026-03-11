@@ -37,6 +37,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "test": "vitest run",
     "preview": "vite preview",
     "tauri": "tauri",
     "prepare": "husky",
@@ -100,6 +101,7 @@
     "lint-staged": "^15.3.0",
     "tw-animate-css": "^1.3.6",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "vitest": "^4.0.18"
   }
 }

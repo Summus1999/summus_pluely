@@ -3,7 +3,7 @@ import { useWindowResize, useGlobalShortcuts } from ".";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { useApp } from "@/contexts";
-import { fetchSTT, fetchAIResponse } from "@/lib/functions";
+import { fetchSTT, streamProviderChatResponse } from "@/lib/functions";
 import {
   DEFAULT_QUICK_ACTIONS,
   DEFAULT_SYSTEM_PROMPT,
@@ -875,7 +875,8 @@ export function useSystemAudio() {
 
         try {
           let chunkCount = 0;
-          for await (const chunk of fetchAIResponse({
+          fullResponse = await streamProviderChatResponse({
+            requestId: String(aiSessionId),
             provider,
             selectedProvider: selectedAIProvider,
             systemPrompt: prompt,
@@ -883,25 +884,25 @@ export function useSystemAudio() {
             userMessage: transcription,
             imagesBase64: [],
             signal,
-          })) {
-            chunkCount++;
-            if (
-              signal.aborted ||
-              aiSessionId !== captureSessionIdRef.current
-            ) {
-              aiFailed = true;
-              // F20: ai_stream_aborted_or_stale
-              console.warn("[system-audio] ai_stream_aborted_or_stale", {
-                sessionId: aiSessionId,
-                currentSessionId: captureSessionIdRef.current,
-                chunkCount,
-                responseChars: fullResponse.length,
-              });
-              break;
-            }
-            fullResponse += chunk;
-            setLastAIResponse((prev) => prev + chunk);
-          }
+            onChunk: (_chunk, accumulatedResponse) => {
+              chunkCount++;
+              if (
+                signal.aborted ||
+                aiSessionId !== captureSessionIdRef.current
+              ) {
+                aiFailed = true;
+                // F20: ai_stream_aborted_or_stale
+                console.warn("[system-audio] ai_stream_aborted_or_stale", {
+                  sessionId: aiSessionId,
+                  currentSessionId: captureSessionIdRef.current,
+                  chunkCount,
+                  responseChars: accumulatedResponse.length,
+                });
+                return;
+              }
+              setLastAIResponse(accumulatedResponse);
+            },
+          });
         } catch (aiError: any) {
           if (!signal.aborted) {
             aiFailed = true;

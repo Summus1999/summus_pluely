@@ -3,6 +3,6 @@
     "bash -c 'npx tsc --noEmit -p tsconfig.json'"
   ],
   "src-tauri/src/**/*.rs": [
-    "cd src-tauri && cargo check"
+    "bash -c 'cargo check --manifest-path src-tauri/Cargo.toml'"
   ]
 }
