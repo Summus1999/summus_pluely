@@ -490,6 +490,101 @@ try {
 
 **参考**：`README.md` 中「macOS 构建维护说明」小节。
 
+#### 陷阱 12：Tauri 命令未注册导致静默失败
+
+**现象**：前端调用 `invoke("command_name")` 无响应，控制台仅打印 `console.error`，用户看不到任何错误提示。
+
+**根因**：Rust 后端未在 `invoke_handler` 中注册该命令，或命令名拼写错误。
+
+**正确做法**：
+
+1. 前端调用前先用 `Grep` 搜索 Rust 代码确认命令已注册：
+   ```bash
+   # 搜索命令定义
+   grep -r "pub async fn command_name" src-tauri/src/
+   
+   # 搜索命令注册
+   grep -r "command_name" src-tauri/src/lib.rs
+   ```
+
+2. 检查 `src-tauri/src/lib.rs` 的 `invoke_handler` 列表：
+   ```rust
+   .invoke_handler(tauri::generate_handler![
+       // 确保命令在这里
+       capture::capture_to_base64,
+       capture::start_screen_capture,
+       // ...
+   ])
+   ```
+
+3. 错误处理必须显示用户可见的错误信息：
+   ```typescript
+   try {
+     await invoke("capture_to_base64");
+   } catch (err) {
+     const message = err instanceof Error ? err.message : String(err);
+     setError(`截图失败：${message}`); // 用户可见
+   }
+   ```
+
+**修复案例**：系统音频面板截图按钮调用 `capture_screenshot`（未注册），应改为 `capture_to_base64`。
+
+#### 陷阱 13：模式切换时异步竞态条件
+
+**现象**：从自动检测（VAD）切换到手动模式时，UI 已显示手动模式但仍在处理 VAD 捕获的语音，看起来像"还在抓录音"。
+
+**根因**：模式切换流程存在异步窗口：
+```typescript
+// 错误：异步操作期间 VAD 仍可触发事件
+setVadConfig(config);
+await invoke("update_vad_config", { config }); // ← VAD 仍在运行
+restartCaptureSession(config); // ← 此时才停止
+```
+
+**正确做法**：在异步操作前立即失效所有 in-flight 事件：
+```typescript
+if (capturing && modeChanged) {
+  abortActiveAIRequest();                    // 中止 AI
+  captureSessionIdRef.current += 1;          // 使旧事件失效
+  transitionRef.current = true;              // 标记过渡状态
+  setIsProcessing(false);                    // 清除 UI 状态
+  setIsAIProcessing(false);
+}
+
+setVadConfig(config);
+await invoke("update_vad_config", { config });
+restartCaptureSession(config);
+```
+
+**关键原则**：
+- 切换模式时先递增 `sessionId`，让旧事件处理器中的 stale check 丢弃结果
+- 立即清除 UI 处理状态，给用户即时反馈
+- 异步操作期间任何触发的事件都应被丢弃
+
+#### 陷阱 14：supportsImages 检测过于严格
+
+**现象**：截图按钮被禁用，即使 AI Provider 支持图片输入。
+
+**根因**：检测逻辑依赖 curl 模板是否包含 `{{IMAGE}}` 占位符，但某些 Provider 可能不显式使用该占位符。
+
+**正确做法**：
+```typescript
+// 不要仅依赖 curl 检测
+const hasImageSupport = selectedProvider.curl?.includes("{{IMAGE}}") ?? false;
+
+// 应该默认启用或在 Provider 配置中明确标记
+const hasImageSupport = true; // 默认启用，让后端处理不支持的情况
+```
+
+或在 Provider 配置中添加显式标记：
+```typescript
+{
+  id: "siliconflow",
+  supportsImages: true,  // 显式标记
+  curl: `...`,
+}
+```
+
 ---
 
 ## 8. 任务执行流程
