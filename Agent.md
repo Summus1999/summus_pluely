@@ -54,6 +54,7 @@ docs/plans/             # 功能规划和检查清单
 | 添加新 AI Provider | `src/config/ai-providers.constants.ts` |
 | 添加新 STT Provider | `src/config/stt.constants.ts` |
 | UI 组件开发 | `components.json`, `src/components/ui/` |
+| 修改 `src-tauri/src/lib.rs` | 本文档 7 节「陷阱 11：macOS lib.rs 构建失败」 |
 
 ### Tier 3: 持久化知识库（主动查询）
 
@@ -180,7 +181,9 @@ GitHub Actions 工作流：
 - `.github/workflows/ci.yml` - PR 时触发
 - `.github/workflows/publish.yml` - 发布时触发
 
-包含：类型检查、多平台构建、Tauri 打包
+包含：类型检查、多平台构建、Tauri 打包。
+
+**注意**：若修改了 `src-tauri/src/lib.rs`，本地 `cargo check` 无法验证 macOS 专用代码；需依赖 CI 的 macOS job 或本地 macOS 环境做完整构建验证。
 
 ---
 
@@ -470,6 +473,23 @@ try {
 - 连续模式需要手动调用 `startContinuousRecording()`
 - VAD 模式自动开始录音，检测到语音后自动处理
 
+#### 陷阱 11：macOS lib.rs 构建失败
+
+**现象**：CI 或本地 macOS 构建报错 `cannot find type AppHandle in this scope` 或 `cannot find type WebviewWindow in this scope`。
+
+**根因**：`src-tauri/src/lib.rs` 中的 macOS 面板初始化（`tauri-nspanel`）仅在 `target_os = "macos"` 下参与编译，在 Windows/Linux 开发机上 `cargo check` 不会编译该段代码，因此容易在重构时被无意改坏。
+
+**修改 lib.rs 时必须遵守**：
+
+1. `init` 函数保持 Tauri 2 泛型签名：`fn init<R: Runtime>(app_handle: &AppHandle<R>)`
+2. 窗口类型使用 `WebviewWindow<R>`，禁止裸类型 `WebviewWindow`
+3. 顶部必须有条件导入：`#[cfg(target_os = "macos")] use tauri::{AppHandle, Runtime, WebviewWindow};`
+4. `run()` 中 macOS 条件分支必须能继续挂载 `tauri_nspanel` 和 `tauri_plugin_macos_permissions`（使用条件 `let builder = builder.plugin(...)` 重新绑定，或保持 `let mut builder`）
+
+**验证**：修改后必须在 macOS 环境或 CI 的 macOS job 中执行 `npm run tauri build` 或 `cargo check --target x86_64-apple-darwin`，Linux/Windows 的 `cargo check` 无法发现该段错误。
+
+**参考**：`README.md` 中「macOS 构建维护说明」小节。
+
 ---
 
 ## 8. 任务执行流程
@@ -548,6 +568,7 @@ unlisten();
 | 2026-03-10 | AI | 创建初始版本，基于 Harness Engineering 框架 |
 | 2026-03-10 | AI | 添加 Pluely 特有陷阱（10个常见错误模式） |
 | 2026-03-10 | AI | 更新四层反馈闭环，明确人工测试环节 |
+| 2026-03-11 | AI | 添加陷阱 11：macOS lib.rs 构建失败；Tier 2 增加 lib.rs 修改指引 |
 
 ---
 

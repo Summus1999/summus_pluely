@@ -434,6 +434,19 @@ npm run tauri build
 - **Windows**: `.msi`, `.exe`
 - **Linux**: `.deb`, `.rpm`, `.AppImage`
 
+### macOS 构建维护说明
+
+`src-tauri/src/lib.rs` 中的 macOS 面板初始化依赖 `tauri-nspanel`，这部分代码只能在 `target_os = "macos"` 下参与编译，因此很容易在非 macOS 开发机上被无意改坏。
+
+维护这段代码时请注意：
+
+- `init` 函数优先保持 Tauri 2 的泛型签名：`fn init<R: Runtime>(app_handle: &AppHandle<R>)`
+- 对应窗口类型应保持为 `WebviewWindow<R>`，不要退回未导入的裸类型写法
+- 顶部导入需要包含 `AppHandle`、`Runtime` 和 `WebviewWindow`
+- `run()` 里的 `builder` 需要保留 macOS 条件分支下的继续挂载能力；无论使用 `mut` 还是条件重新绑定，最终都必须能继续接入 `tauri_nspanel` 和 `tauri_plugin_macos_permissions`
+
+如果 macOS 构建报出 `cannot find type AppHandle in this scope` 或 `cannot find type WebviewWindow in this scope`，先检查以上四项，再继续排查依赖版本问题。
+
 ---
 
 ## 贡献代码

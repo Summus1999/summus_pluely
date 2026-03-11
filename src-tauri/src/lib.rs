@@ -15,6 +15,9 @@ use capture::CaptureState;
 use speaker::VadConfig;
 
 #[cfg(target_os = "macos")]
+use tauri::{AppHandle, Runtime, WebviewWindow};
+
+#[cfg(target_os = "macos")]
 #[allow(deprecated)]
 use tauri_nspanel::{cocoa::appkit::NSWindowCollectionBehavior, panel_delegate, WebviewWindowExt};
 
@@ -80,9 +83,8 @@ pub fn run() {
         }))
         .plugin(tauri_plugin_machine_uid::init());
     #[cfg(target_os = "macos")]
-    {
-        builder = builder.plugin(tauri_nspanel::init());
-    }
+    let builder = builder.plugin(tauri_nspanel::init());
+
     let builder = builder
         .invoke_handler(tauri::generate_handler![
             get_app_version,
@@ -215,9 +217,7 @@ pub fn run() {
 
     // Add macOS-specific permissions plugin
     #[cfg(target_os = "macos")]
-    {
-        builder = builder.plugin(tauri_plugin_macos_permissions::init());
-    }
+    let builder = builder.plugin(tauri_plugin_macos_permissions::init());
 
     builder
         .run(tauri::generate_context!())
@@ -226,8 +226,8 @@ pub fn run() {
 
 #[cfg(target_os = "macos")]
 #[allow(deprecated, unexpected_cfgs)]
-fn init(app_handle: &AppHandle) {
-    let window: WebviewWindow = app_handle.get_webview_window("main").unwrap();
+fn init<R: Runtime>(app_handle: &AppHandle<R>) {
+    let window: WebviewWindow<R> = app_handle.get_webview_window("main").unwrap();
 
     let panel = window.to_panel().unwrap();
 
