@@ -175,24 +175,37 @@ export async function* fetchAIResponse(params: {
       }
     }
 
-    const fetchFunction = url?.includes("http") ? tauriFetch : fetch;
+    const useTauri = url?.includes("http");
+    const fetchFunction = useTauri ? tauriFetch : fetch;
 
     console.debug("[ai-response] Sending request", {
       url,
       method: curlJson.method || "POST",
       streaming: provider?.streaming,
       providerId: provider?.id,
+      useTauri,
     });
 
     let response;
     try {
-      const fetchPromise = fetchFunction(url, {
+      // NOTE: Do NOT pass `signal` to tauriFetch — Tauri HTTP plugin on Windows
+      // may hang indefinitely when AbortSignal is provided. We handle abort
+      // manually via signal checks after the fetch resolves.
+      const fetchOptions: RequestInit = {
         method: curlJson.method || "POST",
         headers,
         body: curlJson.method === "GET" ? undefined : JSON.stringify(bodyObj),
-        signal,
-      });
+      };
+      // Only pass signal to native browser fetch (not tauriFetch)
+      if (!useTauri) {
+        fetchOptions.signal = signal;
+      }
+      const fetchPromise = fetchFunction(url, fetchOptions);
       response = await withTimeout(fetchPromise, FETCH_TIMEOUT_MS, "API 连接");
+
+      // Check abort after fetch resolves (for tauriFetch path)
+      if (signal?.aborted) return;
+
       console.debug("[ai-response] Response received", {
         status: response.status,
         ok: response.ok,
