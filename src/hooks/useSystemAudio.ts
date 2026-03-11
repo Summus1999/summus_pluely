@@ -100,6 +100,15 @@ export function useSystemAudio() {
   const transitionRef = useRef<boolean>(false);
   const captureSessionIdRef = useRef<number>(0);
 
+  // Refs to avoid stale closures in the async speech-detected listener
+  const selectedSttProviderRef = useRef(selectedSttProvider);
+  const allSttProvidersRef = useRef(allSttProviders);
+  const processWithAIRef = useRef<typeof processWithAI>(null as any);
+  const useSystemPromptRef = useRef(useSystemPrompt);
+  const systemPromptRef = useRef(systemPrompt);
+  const contextContentRef = useRef(contextContent);
+  const conversationRef = useRef(conversation);
+
   const createEmptyConversation = useCallback(
     (): ChatConversation => ({
       id: generateConversationId("sysaudio"),
@@ -126,6 +135,14 @@ export function useSystemAudio() {
     transitionRef.current =
       isStartingCapture || isStoppingCapture || isFlushingCapture;
   }, [isStartingCapture, isStoppingCapture, isFlushingCapture]);
+
+  // Keep refs in sync for the speech-detected handler
+  useEffect(() => { selectedSttProviderRef.current = selectedSttProvider; }, [selectedSttProvider]);
+  useEffect(() => { allSttProvidersRef.current = allSttProviders; }, [allSttProviders]);
+  useEffect(() => { useSystemPromptRef.current = useSystemPrompt; }, [useSystemPrompt]);
+  useEffect(() => { systemPromptRef.current = systemPrompt; }, [systemPrompt]);
+  useEffect(() => { contextContentRef.current = contextContent; }, [contextContent]);
+  useEffect(() => { conversationRef.current = conversation; }, [conversation]);
 
   // Load context settings and VAD config from localStorage on mount
   useEffect(() => {
@@ -240,10 +257,13 @@ export function useSystemAudio() {
   // Handle single speech detection event (both VAD and continuous modes)
   useEffect(() => {
     let speechUnlisten: (() => void) | undefined;
+    let cancelled = false;
 
     const setupEventListener = async () => {
       try {
-        speechUnlisten = await listen("speech-detected", async (event) => {
+        const unlisten = await listen("speech-detected", async (event) => {
+          if (cancelled) return;
+
           const sessionId = captureSessionIdRef.current;
 
           try {
@@ -264,15 +284,19 @@ export function useSystemAudio() {
             }
             const audioBlob = new Blob([bytes], { type: "audio/wav" });
 
-            if (!selectedSttProvider.provider) {
+            // Read from refs to avoid stale closures
+            const currentSttProvider = selectedSttProviderRef.current;
+            const currentAllSttProviders = allSttProvidersRef.current;
+
+            if (!currentSttProvider.provider) {
               if (sessionId === captureSessionIdRef.current && capturingRef.current) {
                 setError("未选择语音服务商。");
               }
               return;
             }
 
-            const providerConfig = allSttProviders.find(
-              (p) => p.id === selectedSttProvider.provider
+            const providerConfig = currentAllSttProviders.find(
+              (p) => p.id === currentSttProvider.provider
             );
 
             if (!providerConfig) {
@@ -288,7 +312,7 @@ export function useSystemAudio() {
             // Add timeout wrapper for STT request (30 seconds)
             const sttPromise = fetchSTT({
               provider: providerConfig,
-              selectedProvider: selectedSttProvider,
+              selectedProvider: currentSttProvider,
               audio: audioBlob,
             });
 
@@ -302,7 +326,7 @@ export function useSystemAudio() {
             // F15: stt_request_started
             console.info("[system-audio] stt_request_started", {
               sessionId,
-              providerId: selectedSttProvider.provider,
+              providerId: currentSttProvider.provider,
             });
 
             try {
@@ -310,6 +334,8 @@ export function useSystemAudio() {
                 sttPromise,
                 timeoutPromise,
               ]);
+
+              if (cancelled) return;
 
               if (
                 sessionId !== captureSessionIdRef.current ||
@@ -333,15 +359,15 @@ export function useSystemAudio() {
                   transcriptionLength: transcription.length,
                 });
 
-                const effectiveSystemPrompt = useSystemPrompt
-                  ? systemPrompt || DEFAULT_SYSTEM_PROMPT
-                  : contextContent || DEFAULT_SYSTEM_PROMPT;
+                const effectiveSystemPrompt = useSystemPromptRef.current
+                  ? systemPromptRef.current || DEFAULT_SYSTEM_PROMPT
+                  : contextContentRef.current || DEFAULT_SYSTEM_PROMPT;
 
-                const previousMessages = conversation.messages.map((msg) => {
+                const previousMessages = conversationRef.current.messages.map((msg) => {
                   return { role: msg.role, content: msg.content };
                 });
 
-                await processWithAI(
+                await processWithAIRef.current(
                   transcription,
                   effectiveSystemPrompt,
                   previousMessages
@@ -350,6 +376,7 @@ export function useSystemAudio() {
                 setError("收到空的转录结果");
               }
             } catch (sttError: any) {
+              if (cancelled) return;
               // F18: stt_request_failed
               console.warn("[system-audio] stt_request_failed", {
                 sessionId,
@@ -365,7 +392,7 @@ export function useSystemAudio() {
               }
             }
           } catch (err) {
-            if (sessionId === captureSessionIdRef.current && capturingRef.current) {
+            if (!cancelled && sessionId === captureSessionIdRef.current && capturingRef.current) {
               setError("语音处理失败");
             }
           } finally {
@@ -374,22 +401,28 @@ export function useSystemAudio() {
             transitionRef.current = false;
           }
         });
+
+        // If effect was cleaned up while awaiting listen(), unlisten immediately
+        if (cancelled) {
+          unlisten();
+          return;
+        }
+
+        speechUnlisten = unlisten;
       } catch (err) {
-        setError("语音监听设置失败");
+        if (!cancelled) {
+          setError("语音监听设置失败");
+        }
       }
     };
 
     setupEventListener();
 
     return () => {
+      cancelled = true;
       if (speechUnlisten) speechUnlisten();
     };
-  }, [
-    capturing,
-    selectedSttProvider,
-    allSttProviders,
-    conversation.messages.length,
-  ]);
+  }, [capturing]);
 
   // Context management functions
   const saveContextSettings = useCallback(
@@ -902,6 +935,9 @@ export function useSystemAudio() {
     },
     [selectedAIProvider, allAiProviders, conversation.messages]
   );
+
+  // Keep processWithAI ref in sync
+  useEffect(() => { processWithAIRef.current = processWithAI; }, [processWithAI]);
 
   const startCapture = useCallback(async () => {
     await startCaptureSession(vadConfig);
