@@ -1212,6 +1212,16 @@ export function useSystemAudio() {
         capturing,
       });
 
+      // When switching modes while capturing, immediately invalidate any in-flight
+      // VAD speech events to prevent stale audio from being processed after the switch.
+      if (capturing && modeChanged) {
+        abortActiveAIRequest();
+        captureSessionIdRef.current += 1;
+        transitionRef.current = true;
+        setIsProcessing(false);
+        setIsAIProcessing(false);
+      }
+
       setVadConfig(config);
       safeLocalStorage.setItem("vad_config", JSON.stringify(config));
       await invoke("update_vad_config", { config });
@@ -1230,9 +1240,10 @@ export function useSystemAudio() {
         });
       }
     } catch (error) {
+      transitionRef.current = false;
       console.error("Failed to update VAD config:", error);
     }
-  }, [capturing, restartCaptureSession, vadConfig.enabled]);
+  }, [capturing, restartCaptureSession, vadConfig.enabled, abortActiveAIRequest]);
 
   // Keyboard arrow key support for scrolling (local shortcut)
   useEffect(() => {
