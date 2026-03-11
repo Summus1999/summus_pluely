@@ -7,6 +7,7 @@ import { fetchSTT, fetchAIResponse } from "@/lib/functions";
 import {
   DEFAULT_QUICK_ACTIONS,
   DEFAULT_SYSTEM_PROMPT,
+  SPEECH_TO_TEXT_PROVIDERS,
   STORAGE_KEYS,
 } from "@/config";
 import {
@@ -285,14 +286,39 @@ export function useSystemAudio() {
             const audioBlob = new Blob([bytes], { type: "audio/wav" });
 
             // Read from refs to avoid stale closures
-            const currentSttProvider = selectedSttProviderRef.current;
-            const currentAllSttProviders = allSttProvidersRef.current;
+            let currentSttProvider = selectedSttProviderRef.current;
+            let currentAllSttProviders = allSttProvidersRef.current;
+
+            // Fallback: if ref is empty, try reading directly from localStorage
+            if (!currentSttProvider.provider) {
+              try {
+                const stored = safeLocalStorage.getItem(STORAGE_KEYS.SELECTED_STT_PROVIDER);
+                if (stored) {
+                  const parsed = JSON.parse(stored);
+                  if (parsed?.provider) {
+                    currentSttProvider = parsed;
+                    selectedSttProviderRef.current = parsed;
+                    console.info("[system-audio] stt_provider_recovered_from_storage", {
+                      provider: parsed.provider,
+                    });
+                  }
+                }
+              } catch {
+                // ignore parse errors
+              }
+            }
 
             if (!currentSttProvider.provider) {
               if (sessionId === captureSessionIdRef.current && capturingRef.current) {
                 setError("未选择语音服务商。");
               }
               return;
+            }
+
+            // Also recover allSttProviders if needed
+            if (!currentAllSttProviders.length) {
+              currentAllSttProviders = [...SPEECH_TO_TEXT_PROVIDERS];
+              allSttProvidersRef.current = currentAllSttProviders;
             }
 
             const providerConfig = currentAllSttProviders.find(
