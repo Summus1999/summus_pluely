@@ -11,6 +11,24 @@ import curl2Json from "@bany/curl-to-json";
 import { getResponseSettings, RESPONSE_LENGTHS, LANGUAGES } from "@/lib";
 import { MARKDOWN_FORMATTING_INSTRUCTIONS } from "@/config/constants";
 
+// Timeout constants
+const FETCH_TIMEOUT_MS = 30_000; // 30s for initial connection
+const STREAM_READ_TIMEOUT_MS = 15_000; // 15s between stream chunks
+
+/** Race a promise against a timeout; rejects with a descriptive error. */
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`${label} 超时 (${ms / 1000}s)`)),
+      ms
+    );
+    promise.then(
+      (v) => { clearTimeout(timer); resolve(v); },
+      (e) => { clearTimeout(timer); reject(e); }
+    );
+  });
+}
+
 function buildEnhancedSystemPrompt(baseSystemPrompt?: string): string {
   const responseSettings = getResponseSettings();
   const prompts: string[] = [];
@@ -159,13 +177,26 @@ export async function* fetchAIResponse(params: {
 
     const fetchFunction = url?.includes("http") ? tauriFetch : fetch;
 
+    console.debug("[ai-response] Sending request", {
+      url,
+      method: curlJson.method || "POST",
+      streaming: provider?.streaming,
+      providerId: provider?.id,
+    });
+
     let response;
     try {
-      response = await fetchFunction(url, {
+      const fetchPromise = fetchFunction(url, {
         method: curlJson.method || "POST",
         headers,
         body: curlJson.method === "GET" ? undefined : JSON.stringify(bodyObj),
         signal,
+      });
+      response = await withTimeout(fetchPromise, FETCH_TIMEOUT_MS, "API 连接");
+      console.debug("[ai-response] Response received", {
+        status: response.status,
+        ok: response.ok,
+        hasBody: !!response.body,
       });
     } catch (fetchError) {
       // Check if aborted
@@ -212,68 +243,104 @@ export async function* fetchAIResponse(params: {
     }
 
     if (!response.body) {
-      throw new Error("不支持流式传输或响应体缺失");
+      // Fallback: read full body when ReadableStream is unavailable
+      console.warn("[ai-response] response.body is null, falling back to full read");
+      let json;
+      try {
+        json = await response.json();
+      } catch (parseError) {
+        throw new Error(
+          `解析响应失败 (无流): ${
+            parseError instanceof Error ? parseError.message : "未知错误"
+          }`
+        );
+      }
+      const content =
+        getByPath(json, provider?.responseContentPath || "") || "";
+      if (content) yield content;
+      return;
     }
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
+    let chunkIndex = 0;
 
-    while (true) {
-      // Check if aborted
-      if (signal?.aborted) {
-        reader.cancel();
-        return;
-      }
-
-      let readResult;
-      try {
-        readResult = await reader.read();
-      } catch (readError) {
+    try {
+      while (true) {
         // Check if aborted
-        if (
-          signal?.aborted ||
-          (readError instanceof Error && readError.name === "AbortError")
-        ) {
-          return; // Silently return on abort
+        if (signal?.aborted) {
+          reader.cancel();
+          return;
         }
-        throw new Error(
-          `读取流错误: ${
-            readError instanceof Error ? readError.message : "未知错误"
-          }`
-        );
-      }
-      const { done, value } = readResult;
-      if (done) break;
 
-      // Check if aborted before processing
-      if (signal?.aborted) {
-        reader.cancel();
-        return;
-      }
+        let readResult;
+        try {
+          readResult = await withTimeout(
+            reader.read(),
+            STREAM_READ_TIMEOUT_MS,
+            "流式读取"
+          );
+        } catch (readError) {
+          // Check if aborted
+          if (
+            signal?.aborted ||
+            (readError instanceof Error && readError.name === "AbortError")
+          ) {
+            return; // Silently return on abort
+          }
+          // If we already got some data but stream timed out, treat as done
+          if (
+            chunkIndex > 0 &&
+            readError instanceof Error &&
+            readError.message.includes("超时")
+          ) {
+            console.warn("[ai-response] Stream read timed out after receiving data, treating as done");
+            break;
+          }
+          throw new Error(
+            `读取流错误: ${
+              readError instanceof Error ? readError.message : "未知错误"
+            }`
+          );
+        }
+        const { done, value } = readResult;
+        if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
+        chunkIndex++;
 
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-      for (const line of lines) {
-        if (line.startsWith("data:")) {
-          const trimmed = line.substring(5).trim();
-          if (!trimmed || trimmed === "[DONE]") continue;
-          try {
-            const parsed = JSON.parse(trimmed);
-            const delta = getStreamingContent(
-              parsed,
-              provider?.responseContentPath || ""
-            );
-            if (delta) {
-              yield delta;
+        // Check if aborted before processing
+        if (signal?.aborted) {
+          reader.cancel();
+          return;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        for (const line of lines) {
+          const trimmedLine = line.trim();
+          if (trimmedLine.startsWith("data:")) {
+            const trimmed = trimmedLine.substring(5).trim();
+            if (!trimmed || trimmed === "[DONE]") continue;
+            try {
+              const parsed = JSON.parse(trimmed);
+              const delta = getStreamingContent(
+                parsed,
+                provider?.responseContentPath || ""
+              );
+              if (delta) {
+                yield delta;
+              }
+            } catch (e) {
+              // Ignore parsing errors for partial JSON chunks
             }
-          } catch (e) {
-            // Ignore parsing errors for partial JSON chunks
           }
         }
       }
+    } finally {
+      try { reader.cancel(); } catch { /* ignore */ }
     }
   } catch (error) {
     throw new Error(
